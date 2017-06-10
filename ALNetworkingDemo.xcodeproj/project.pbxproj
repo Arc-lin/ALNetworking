@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		351B9CC81EEBA8530047FD26 /* NSDictionary+Log.m in Sources */ = {isa = PBXBuildFile; fileRef = 351B9CC71EEBA8530047FD26 /* NSDictionary+Log.m */; };
 		354C5B4C1EDD5CEA00EDCFA6 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 354C5B4B1EDD5CEA00EDCFA6 /* main.m */; };
 		354C5B4F1EDD5CEA00EDCFA6 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 354C5B4E1EDD5CEA00EDCFA6 /* AppDelegate.m */; };
 		354C5B521EDD5CEA00EDCFA6 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 354C5B511EDD5CEA00EDCFA6 /* ViewController.m */; };
@@ -14,6 +15,20 @@
 		354C5B571EDD5CEA00EDCFA6 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 354C5B561EDD5CEA00EDCFA6 /* Assets.xcassets */; };
 		354C5B5A1EDD5CEA00EDCFA6 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 354C5B581EDD5CEA00EDCFA6 /* LaunchScreen.storyboard */; };
 		354C5B651EDD5CEA00EDCFA6 /* ALNetworkingDemoTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 354C5B641EDD5CEA00EDCFA6 /* ALNetworkingDemoTests.m */; };
+		354C5B7C1EDD5D0D00EDCFA6 /* ALNetworking.m in Sources */ = {isa = PBXBuildFile; fileRef = 354C5B711EDD5D0D00EDCFA6 /* ALNetworking.m */; };
+		354C5B7D1EDD5D0D00EDCFA6 /* ALNetworkingBaseManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 354C5B731EDD5D0D00EDCFA6 /* ALNetworkingBaseManager.m */; };
+		354C5B7E1EDD5D0D00EDCFA6 /* ALNetworkingCache.m in Sources */ = {isa = PBXBuildFile; fileRef = 354C5B751EDD5D0D00EDCFA6 /* ALNetworkingCache.m */; };
+		354C5B7F1EDD5D0D00EDCFA6 /* ALNetworkingConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = 354C5B771EDD5D0D00EDCFA6 /* ALNetworkingConfig.m */; };
+		354C5B801EDD5D0D00EDCFA6 /* ALNetworkingResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = 354C5B791EDD5D0D00EDCFA6 /* ALNetworkingResponse.m */; };
+		356E54E41EE2D40D00EA295A /* ALNetworkingRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 356E54E31EE2D40D00EA295A /* ALNetworkingRequest.m */; };
+		356E54E71EE2D46F00EA295A /* ALNetworkingConst.m in Sources */ = {isa = PBXBuildFile; fileRef = 356E54E61EE2D46F00EA295A /* ALNetworkingConst.m */; };
+		3585C9D91EE560A700E1E121 /* RACSignal+ALNetworking.m in Sources */ = {isa = PBXBuildFile; fileRef = 3585C9D81EE560A700E1E121 /* RACSignal+ALNetworking.m */; };
+		3585C9DC1EE5621500E1E121 /* ALMyHTTPResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = 3585C9DB1EE5621500E1E121 /* ALMyHTTPResponse.m */; };
+		35A0C0651EE6ADC800443049 /* ALNetworkingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 35A0C0641EE6ADC800443049 /* ALNetworkingViewController.m */; };
+		35CCEE3E1EE8EF4900E9F7AE /* UIViewController+ALExtension.m in Sources */ = {isa = PBXBuildFile; fileRef = 35CCEE3D1EE8EF4800E9F7AE /* UIViewController+ALExtension.m */; };
+		35CCEE461EE943AC00E9F7AE /* ALNetworkingDetail.html in Resources */ = {isa = PBXBuildFile; fileRef = 35CCEE451EE943AC00E9F7AE /* ALNetworkingDetail.html */; };
+		77C441752509CEFCBFECBC2C /* libPods-ALNetworkingDemo.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 18FE5E1C1644EE59DCD31373 /* libPods-ALNetworkingDemo.a */; };
+		C4D389A498EF67F07D87ECED /* libPods-ALNetworkingDemoTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BD68AC45FBF9D7F4AF02D8EF /* libPods-ALNetworkingDemoTests.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -27,6 +42,10 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		1409BB7578BBCE9DE79420C6 /* Pods-ALNetworkingDemoTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ALNetworkingDemoTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-ALNetworkingDemoTests/Pods-ALNetworkingDemoTests.debug.xcconfig"; sourceTree = "<group>"; };
+		18FE5E1C1644EE59DCD31373 /* libPods-ALNetworkingDemo.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-ALNetworkingDemo.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		29678330BD75BDF99655F5A3 /* Pods-ALNetworkingDemo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ALNetworkingDemo.release.xcconfig"; path = "Pods/Target Support Files/Pods-ALNetworkingDemo/Pods-ALNetworkingDemo.release.xcconfig"; sourceTree = "<group>"; };
+		351B9CC71EEBA8530047FD26 /* NSDictionary+Log.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSDictionary+Log.m"; sourceTree = "<group>"; };
 		354C5B471EDD5CEA00EDCFA6 /* ALNetworkingDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ALNetworkingDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		354C5B4B1EDD5CEA00EDCFA6 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		354C5B4D1EDD5CEA00EDCFA6 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -40,6 +59,32 @@
 		354C5B601EDD5CEA00EDCFA6 /* ALNetworkingDemoTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ALNetworkingDemoTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		354C5B641EDD5CEA00EDCFA6 /* ALNetworkingDemoTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ALNetworkingDemoTests.m; sourceTree = "<group>"; };
 		354C5B661EDD5CEA00EDCFA6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		354C5B701EDD5D0D00EDCFA6 /* ALNetworking.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ALNetworking.h; sourceTree = "<group>"; };
+		354C5B711EDD5D0D00EDCFA6 /* ALNetworking.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ALNetworking.m; sourceTree = "<group>"; };
+		354C5B721EDD5D0D00EDCFA6 /* ALNetworkingBaseManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ALNetworkingBaseManager.h; sourceTree = "<group>"; };
+		354C5B731EDD5D0D00EDCFA6 /* ALNetworkingBaseManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ALNetworkingBaseManager.m; sourceTree = "<group>"; };
+		354C5B741EDD5D0D00EDCFA6 /* ALNetworkingCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ALNetworkingCache.h; sourceTree = "<group>"; };
+		354C5B751EDD5D0D00EDCFA6 /* ALNetworkingCache.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ALNetworkingCache.m; sourceTree = "<group>"; };
+		354C5B761EDD5D0D00EDCFA6 /* ALNetworkingConfig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ALNetworkingConfig.h; sourceTree = "<group>"; };
+		354C5B771EDD5D0D00EDCFA6 /* ALNetworkingConfig.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ALNetworkingConfig.m; sourceTree = "<group>"; };
+		354C5B781EDD5D0D00EDCFA6 /* ALNetworkingResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ALNetworkingResponse.h; sourceTree = "<group>"; };
+		354C5B791EDD5D0D00EDCFA6 /* ALNetworkingResponse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ALNetworkingResponse.m; sourceTree = "<group>"; };
+		356E54E21EE2D40D00EA295A /* ALNetworkingRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ALNetworkingRequest.h; sourceTree = "<group>"; };
+		356E54E31EE2D40D00EA295A /* ALNetworkingRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ALNetworkingRequest.m; sourceTree = "<group>"; };
+		356E54E51EE2D46F00EA295A /* ALNetworkingConst.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ALNetworkingConst.h; sourceTree = "<group>"; };
+		356E54E61EE2D46F00EA295A /* ALNetworkingConst.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ALNetworkingConst.m; sourceTree = "<group>"; };
+		3585C9D71EE560A700E1E121 /* RACSignal+ALNetworking.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "RACSignal+ALNetworking.h"; sourceTree = "<group>"; };
+		3585C9D81EE560A700E1E121 /* RACSignal+ALNetworking.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "RACSignal+ALNetworking.m"; sourceTree = "<group>"; };
+		3585C9DA1EE5621500E1E121 /* ALMyHTTPResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ALMyHTTPResponse.h; sourceTree = "<group>"; };
+		3585C9DB1EE5621500E1E121 /* ALMyHTTPResponse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ALMyHTTPResponse.m; sourceTree = "<group>"; };
+		35A0C0631EE6ADC800443049 /* ALNetworkingViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ALNetworkingViewController.h; sourceTree = "<group>"; };
+		35A0C0641EE6ADC800443049 /* ALNetworkingViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ALNetworkingViewController.m; sourceTree = "<group>"; };
+		35CCEE3C1EE8EF4800E9F7AE /* UIViewController+ALExtension.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIViewController+ALExtension.h"; sourceTree = "<group>"; };
+		35CCEE3D1EE8EF4800E9F7AE /* UIViewController+ALExtension.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIViewController+ALExtension.m"; sourceTree = "<group>"; };
+		35CCEE451EE943AC00E9F7AE /* ALNetworkingDetail.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = ALNetworkingDetail.html; sourceTree = "<group>"; };
+		4D1A21C3CCA2E09F3C09228C /* Pods-ALNetworkingDemo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ALNetworkingDemo.debug.xcconfig"; path = "Pods/Target Support Files/Pods-ALNetworkingDemo/Pods-ALNetworkingDemo.debug.xcconfig"; sourceTree = "<group>"; };
+		5DF500BA06D42893564A0A92 /* Pods-ALNetworkingDemoTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ALNetworkingDemoTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-ALNetworkingDemoTests/Pods-ALNetworkingDemoTests.release.xcconfig"; sourceTree = "<group>"; };
+		BD68AC45FBF9D7F4AF02D8EF /* libPods-ALNetworkingDemoTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-ALNetworkingDemoTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -47,6 +92,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				77C441752509CEFCBFECBC2C /* libPods-ALNetworkingDemo.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -54,6 +100,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C4D389A498EF67F07D87ECED /* libPods-ALNetworkingDemoTests.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -63,9 +110,12 @@
 		354C5B3E1EDD5CEA00EDCFA6 = {
 			isa = PBXGroup;
 			children = (
+				354C5B6F1EDD5D0D00EDCFA6 /* ALNetworking */,
 				354C5B491EDD5CEA00EDCFA6 /* ALNetworkingDemo */,
 				354C5B631EDD5CEA00EDCFA6 /* ALNetworkingDemoTests */,
 				354C5B481EDD5CEA00EDCFA6 /* Products */,
+				5BA9C0BB82B8611D3F53F7B2 /* Pods */,
+				630818FFFBDF3E678AE8941C /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -85,6 +135,10 @@
 				354C5B4E1EDD5CEA00EDCFA6 /* AppDelegate.m */,
 				354C5B501EDD5CEA00EDCFA6 /* ViewController.h */,
 				354C5B511EDD5CEA00EDCFA6 /* ViewController.m */,
+				3585C9DA1EE5621500E1E121 /* ALMyHTTPResponse.h */,
+				3585C9DB1EE5621500E1E121 /* ALMyHTTPResponse.m */,
+				3585C9D71EE560A700E1E121 /* RACSignal+ALNetworking.h */,
+				3585C9D81EE560A700E1E121 /* RACSignal+ALNetworking.m */,
 				354C5B531EDD5CEA00EDCFA6 /* Main.storyboard */,
 				354C5B561EDD5CEA00EDCFA6 /* Assets.xcassets */,
 				354C5B581EDD5CEA00EDCFA6 /* LaunchScreen.storyboard */,
@@ -111,6 +165,53 @@
 			path = ALNetworkingDemoTests;
 			sourceTree = "<group>";
 		};
+		354C5B6F1EDD5D0D00EDCFA6 /* ALNetworking */ = {
+			isa = PBXGroup;
+			children = (
+				354C5B701EDD5D0D00EDCFA6 /* ALNetworking.h */,
+				354C5B711EDD5D0D00EDCFA6 /* ALNetworking.m */,
+				354C5B721EDD5D0D00EDCFA6 /* ALNetworkingBaseManager.h */,
+				354C5B731EDD5D0D00EDCFA6 /* ALNetworkingBaseManager.m */,
+				354C5B741EDD5D0D00EDCFA6 /* ALNetworkingCache.h */,
+				354C5B751EDD5D0D00EDCFA6 /* ALNetworkingCache.m */,
+				354C5B761EDD5D0D00EDCFA6 /* ALNetworkingConfig.h */,
+				354C5B771EDD5D0D00EDCFA6 /* ALNetworkingConfig.m */,
+				356E54E51EE2D46F00EA295A /* ALNetworkingConst.h */,
+				356E54E61EE2D46F00EA295A /* ALNetworkingConst.m */,
+				356E54E21EE2D40D00EA295A /* ALNetworkingRequest.h */,
+				356E54E31EE2D40D00EA295A /* ALNetworkingRequest.m */,
+				354C5B781EDD5D0D00EDCFA6 /* ALNetworkingResponse.h */,
+				354C5B791EDD5D0D00EDCFA6 /* ALNetworkingResponse.m */,
+				35A0C0631EE6ADC800443049 /* ALNetworkingViewController.h */,
+				35A0C0641EE6ADC800443049 /* ALNetworkingViewController.m */,
+				35CCEE3C1EE8EF4800E9F7AE /* UIViewController+ALExtension.h */,
+				35CCEE3D1EE8EF4800E9F7AE /* UIViewController+ALExtension.m */,
+				351B9CC71EEBA8530047FD26 /* NSDictionary+Log.m */,
+				35CCEE451EE943AC00E9F7AE /* ALNetworkingDetail.html */,
+			);
+			path = ALNetworking;
+			sourceTree = "<group>";
+		};
+		5BA9C0BB82B8611D3F53F7B2 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				4D1A21C3CCA2E09F3C09228C /* Pods-ALNetworkingDemo.debug.xcconfig */,
+				29678330BD75BDF99655F5A3 /* Pods-ALNetworkingDemo.release.xcconfig */,
+				1409BB7578BBCE9DE79420C6 /* Pods-ALNetworkingDemoTests.debug.xcconfig */,
+				5DF500BA06D42893564A0A92 /* Pods-ALNetworkingDemoTests.release.xcconfig */,
+			);
+			name = Pods;
+			sourceTree = "<group>";
+		};
+		630818FFFBDF3E678AE8941C /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				18FE5E1C1644EE59DCD31373 /* libPods-ALNetworkingDemo.a */,
+				BD68AC45FBF9D7F4AF02D8EF /* libPods-ALNetworkingDemoTests.a */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -118,9 +219,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 354C5B691EDD5CEA00EDCFA6 /* Build configuration list for PBXNativeTarget "ALNetworkingDemo" */;
 			buildPhases = (
+				60B6744F075FF9FBA45FA8E4 /* [CP] Check Pods Manifest.lock */,
 				354C5B431EDD5CEA00EDCFA6 /* Sources */,
 				354C5B441EDD5CEA00EDCFA6 /* Frameworks */,
 				354C5B451EDD5CEA00EDCFA6 /* Resources */,
+				8C0EE415AE16ABAF9F938EA1 /* [CP] Embed Pods Frameworks */,
+				89032B02DC0E1F3804C76C7B /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -135,9 +239,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 354C5B6C1EDD5CEA00EDCFA6 /* Build configuration list for PBXNativeTarget "ALNetworkingDemoTests" */;
 			buildPhases = (
+				689E96970BEDEB0B31DAE4BE /* [CP] Check Pods Manifest.lock */,
 				354C5B5C1EDD5CEA00EDCFA6 /* Sources */,
 				354C5B5D1EDD5CEA00EDCFA6 /* Frameworks */,
 				354C5B5E1EDD5CEA00EDCFA6 /* Resources */,
+				FCEB52C10A375AF8A31215E6 /* [CP] Embed Pods Frameworks */,
+				F8CCBBFE707AE8B0E9328990 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -197,6 +304,7 @@
 			files = (
 				354C5B5A1EDD5CEA00EDCFA6 /* LaunchScreen.storyboard in Resources */,
 				354C5B571EDD5CEA00EDCFA6 /* Assets.xcassets in Resources */,
+				35CCEE461EE943AC00E9F7AE /* ALNetworkingDetail.html in Resources */,
 				354C5B551EDD5CEA00EDCFA6 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -210,13 +318,118 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		60B6744F075FF9FBA45FA8E4 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+		689E96970BEDEB0B31DAE4BE /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+		89032B02DC0E1F3804C76C7B /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-ALNetworkingDemo/Pods-ALNetworkingDemo-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		8C0EE415AE16ABAF9F938EA1 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-ALNetworkingDemo/Pods-ALNetworkingDemo-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		F8CCBBFE707AE8B0E9328990 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-ALNetworkingDemoTests/Pods-ALNetworkingDemoTests-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		FCEB52C10A375AF8A31215E6 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-ALNetworkingDemoTests/Pods-ALNetworkingDemoTests-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		354C5B431EDD5CEA00EDCFA6 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				354C5B7C1EDD5D0D00EDCFA6 /* ALNetworking.m in Sources */,
+				35CCEE3E1EE8EF4900E9F7AE /* UIViewController+ALExtension.m in Sources */,
+				354C5B7D1EDD5D0D00EDCFA6 /* ALNetworkingBaseManager.m in Sources */,
 				354C5B521EDD5CEA00EDCFA6 /* ViewController.m in Sources */,
+				354C5B7F1EDD5D0D00EDCFA6 /* ALNetworkingConfig.m in Sources */,
+				354C5B7E1EDD5D0D00EDCFA6 /* ALNetworkingCache.m in Sources */,
+				354C5B801EDD5D0D00EDCFA6 /* ALNetworkingResponse.m in Sources */,
+				3585C9D91EE560A700E1E121 /* RACSignal+ALNetworking.m in Sources */,
+				3585C9DC1EE5621500E1E121 /* ALMyHTTPResponse.m in Sources */,
 				354C5B4F1EDD5CEA00EDCFA6 /* AppDelegate.m in Sources */,
+				356E54E71EE2D46F00EA295A /* ALNetworkingConst.m in Sources */,
+				356E54E41EE2D40D00EA295A /* ALNetworkingRequest.m in Sources */,
+				35A0C0651EE6ADC800443049 /* ALNetworkingViewController.m in Sources */,
+				351B9CC81EEBA8530047FD26 /* NSDictionary+Log.m in Sources */,
 				354C5B4C1EDD5CEA00EDCFA6 /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -353,6 +566,7 @@
 		};
 		354C5B6A1EDD5CEA00EDCFA6 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 4D1A21C3CCA2E09F3C09228C /* Pods-ALNetworkingDemo.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				DEVELOPMENT_TEAM = 3KUDYRU22W;
@@ -365,6 +579,7 @@
 		};
 		354C5B6B1EDD5CEA00EDCFA6 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 29678330BD75BDF99655F5A3 /* Pods-ALNetworkingDemo.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				DEVELOPMENT_TEAM = 3KUDYRU22W;
@@ -377,6 +592,7 @@
 		};
 		354C5B6D1EDD5CEA00EDCFA6 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 1409BB7578BBCE9DE79420C6 /* Pods-ALNetworkingDemoTests.debug.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				DEVELOPMENT_TEAM = 3KUDYRU22W;
@@ -390,6 +606,7 @@
 		};
 		354C5B6E1EDD5CEA00EDCFA6 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 5DF500BA06D42893564A0A92 /* Pods-ALNetworkingDemoTests.release.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				DEVELOPMENT_TEAM = 3KUDYRU22W;
@@ -420,6 +637,7 @@
 				354C5B6B1EDD5CEA00EDCFA6 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		354C5B6C1EDD5CEA00EDCFA6 /* Build configuration list for PBXNativeTarget "ALNetworkingDemoTests" */ = {
 			isa = XCConfigurationList;
@@ -428,6 +646,7 @@
 				354C5B6E1EDD5CEA00EDCFA6 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
