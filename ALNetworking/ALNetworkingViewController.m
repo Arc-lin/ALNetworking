@@ -119,7 +119,7 @@
                           @"{paramsType}":request.paramsTypeStr,
                           @"{stategy}":request.strategyStr,
                           @"{method}":request.methodStr,
-                          @"{isCache}":@"",
+                          @"{isCache}":response.isCache ? @"True" : @"False",
                           @"{response}":respData};
     [dic enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull key, id  _Nonnull obj, BOOL * _Nonnull stop) {
         htmlStr = [htmlStr stringByReplacingOccurrencesOfString:key withString:obj];

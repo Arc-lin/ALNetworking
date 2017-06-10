@@ -16,4 +16,7 @@
 /** 网络异常错误 */
 @property (nonatomic, strong) NSError *error;
 
+/** 是否是取缓存的响应 */
+@property (nonatomic, assign) BOOL isCache;
+
 @end

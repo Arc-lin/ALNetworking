@@ -221,6 +221,9 @@ static ALNetworking *_networking;
                 [subscriber sendError:KERROR(-99, @"NO CACHE")];
             } else {
                 
+                // 确认是取缓存的响应体
+                response.isCache = YES;
+                
                 // 添加进入历史记录中
                 [self.requestHistories addObject:RACTuplePack([NSDate date],request,response)];
                 
@@ -244,6 +247,10 @@ static ALNetworking *_networking;
             @strongify(self);
             if(cache) {
                 [[RACScheduler scheduler] schedule:^{
+                    
+                    // 确认不是取缓存的响应体
+                    response.isCache = NO;
+                    
                     // 把请求结果写入缓存
                     [self.cache setObject:response forRequestUrl:request.urlStr params:request.params];
                 }];

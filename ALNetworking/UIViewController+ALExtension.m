@@ -18,8 +18,8 @@
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         Class class = [self class];
-        SEL originalSelector1 = @selector(viewDidLoad);
-        SEL swizzledSelector1 = @selector(logger_viewDidLoad);
+        SEL originalSelector1 = @selector(viewDidAppear:);
+        SEL swizzledSelector1 = @selector(logger_viewDidAppear:);
         Method originalMethod1 = class_getInstanceMethod(class, originalSelector1);
         Method swizzledMethod1 = class_getInstanceMethod(class, swizzledSelector1);
         BOOL didAddMethod1 = class_addMethod(class,originalSelector1,method_getImplementation(swizzledMethod1),method_getTypeEncoding(swizzledMethod1));
@@ -31,9 +31,9 @@
     });
 }
 
-- (void)logger_viewDidLoad
+- (void)logger_viewDidAppear:(BOOL)animated
 {
-    [self logger_viewDidLoad];
+    [self logger_viewDidAppear:animated];
     
     UIGestureRecognizer *customGesture = [ALNetworking sharedInstance].config.gesture;
     
@@ -47,11 +47,6 @@
         longPress.minimumPressDuration = 2.0f;
         [self.view addGestureRecognizer:longPress];
     }
-}
-
-- (void)logger_viewWillAppear:(BOOL)animate
-{
-    [self logger_viewWillAppear:animate];
 }
 
 - (void)showLoggerViewController
