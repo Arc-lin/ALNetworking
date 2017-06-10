@@ -70,7 +70,7 @@ Pod::Spec.new do |s|
   #
 
   # s.platform     = :ios
-  # s.platform     = :ios, "5.0"
+  s.platform     = :ios, "8.0"
 
   #  When using multiple platforms
   # s.ios.deployment_target = "5.0"
@@ -85,7 +85,7 @@ Pod::Spec.new do |s|
   #  Supports git, hg, bzr, svn and HTTP.
   #
 
-  s.source       = { :git => "A networking framework , encapsulation of AFNetworking3.0,ReactiveCocoa2.5,YYCache,YYModel", :tag => "#{s.version}" }
+  s.source       = { :git => "https://github.com/Arc-lin/ALNetworking.git", :tag => "1.0" }
 
 
   # ――― Source Code ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
@@ -138,6 +138,9 @@ Pod::Spec.new do |s|
   # s.requires_arc = true
 
   # s.xcconfig = { "HEADER_SEARCH_PATHS" => "$(SDKROOT)/usr/include/libxml2" }
-  s.dependency "ReactiveCocoa", "~> 2.5","AFNetworking","YYCache","YYModel"
+  s.dependency "ReactiveCocoa","~> 2.5"
+  s.dependency "AFNetworking"
+  s.dependency "YYCache"
+  s.dependency "YYModel"
 
 end

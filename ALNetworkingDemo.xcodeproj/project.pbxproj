@@ -568,6 +568,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 4D1A21C3CCA2E09F3C09228C /* Pods-ALNetworkingDemo.debug.xcconfig */;
 			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				DEVELOPMENT_TEAM = 3KUDYRU22W;
 				INFOPLIST_FILE = ALNetworkingDemo/Info.plist;
@@ -581,6 +582,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 29678330BD75BDF99655F5A3 /* Pods-ALNetworkingDemo.release.xcconfig */;
 			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				DEVELOPMENT_TEAM = 3KUDYRU22W;
 				INFOPLIST_FILE = ALNetworkingDemo/Info.plist;

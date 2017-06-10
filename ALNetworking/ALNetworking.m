@@ -13,7 +13,7 @@
 #import "ALNetworkingViewController.h"
 
 #import <YYModel/YYModel.h>
-#import <AFNetworkReachabilityManager.h>
+#import <AFNetworking/AFNetworking.h>
 
 #define KERROR(eCode,desc) [NSError errorWithDomain:@"alnetworking" code:eCode userInfo:@{NSLocalizedDescriptionKey:desc}]
 
