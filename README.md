@@ -193,7 +193,7 @@ According to RAC, you can use `merge:` `concat:` `zip:` an so on to execute mult
 To use ALNetworking add the following to your Podfile
 
 ```
-pod 'YTKNetwork'
+pod 'ALNetworking'
 ```
 
 ALNetworking is based on AFNetworking. You can find more detail about version compability at [AFNetworking README](https://github.com/AFNetworking/AFNetworking).
