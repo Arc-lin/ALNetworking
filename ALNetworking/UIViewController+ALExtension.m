@@ -51,7 +51,10 @@
 
 - (void)showLoggerViewController
 {
-    if([ALNetworking sharedInstance].config.debugMode) { // 如果是调试模式的话
+    NSString *className = NSStringFromClass(self.class);
+    if([ALNetworking sharedInstance].config.debugMode &&
+       ![className isEqualToString:@"ALNetworkingHistoryTableViewController"] &&
+       ![className isEqualToString:@"ALNetworkingWebViewController"]) { // 如果是调试模式的话才可以弹出
         ALNetworkingViewController *vc = [[ALNetworkingViewController alloc] initWithHistoryViewController];
         vc.modalPresentationStyle = UIModalPresentationFormSheet;
         [self presentViewController:vc animated:YES completion:nil];

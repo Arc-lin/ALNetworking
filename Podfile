@@ -10,6 +10,7 @@ target 'ALNetworkingDemo' do
   pod 'ReactiveCocoa','2.5'
   pod 'YYCache'
   pod 'YYModel'
+  pod 'SVProgressHUD'
 
   target 'ALNetworkingDemoTests' do
     inherit! :search_paths

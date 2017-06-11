@@ -21,21 +21,24 @@ PODS:
   - ReactiveCocoa/no-arc (2.5)
   - ReactiveCocoa/UI (2.5):
     - ReactiveCocoa/Core
+  - SVProgressHUD (2.1.2)
   - YYCache (1.0.4)
   - YYModel (1.0.4)
 
 DEPENDENCIES:
   - AFNetworking
   - ReactiveCocoa (= 2.5)
+  - SVProgressHUD
   - YYCache
   - YYModel
 
 SPEC CHECKSUMS:
   AFNetworking: 5e0e199f73d8626b11e79750991f5d173d1f8b67
   ReactiveCocoa: e2db045570aa97c695e7aa97c2bcab222ae51f4a
+  SVProgressHUD: c404a55d78acbeb7ebb78b76d3faf986475a6994
   YYCache: 8105b6638f5e849296c71f331ff83891a4942952
   YYModel: 2a7fdd96aaa4b86a824e26d0c517de8928c04b30
 
-PODFILE CHECKSUM: 8e3d867797a04c81b98a1bbf153deb71fd292829
+PODFILE CHECKSUM: 7ad5089e1a0ccd2f3fc16cd00d9cc6e055f642bc
 
 COCOAPODS: 1.1.1

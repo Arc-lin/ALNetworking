@@ -70,6 +70,7 @@ static ALNetworking *_networking;
 {
     return ^ALNetworking *(NSString *url){
         self.request.urlStr = [NSString stringWithFormat:@"%@/%@",self.config.urlPerfix,url];
+        self.request.ignoreCustomResponseClass = NO;
         return self;
     };
 }
@@ -78,6 +79,7 @@ static ALNetworking *_networking;
 {
     return ^ALNetworking *(NSString *url){
         self.request.urlStr = url;
+        self.request.ignoreCustomResponseClass = YES;
         return self;
     };
 }
@@ -183,11 +185,14 @@ static ALNetworking *_networking;
     
     return [[[requestSignal map:^id(RACTuple *value) {
         @strongify(self);
-        // 如果有设置自定义响应体类的话
+        // 如果有设置并且不忽略自定义响应体类
         if (self.config.customRespClazz) {
+            ALNetworkingRequest  *req  = value.first;
             ALNetworkingResponse *resp = value.second;
+            if(req.ignoreCustomResponseClass) return RACTuplePack(req,resp);
+            
             id customResponse = [self.config.customRespClazz yy_modelWithDictionary:resp.rawData];
-            return RACTuplePack(value.first,customResponse);
+            return RACTuplePack(req,customResponse);
         }
         return value;
     }] flattenMap:self.config.handleResponse] catch:^RACSignal *(NSError *error) {
@@ -245,7 +250,7 @@ static ALNetworking *_networking;
         [ALNetworkingBaseManager requestForRequest:request reponseBlock:^(ALNetworkingRequest *request, ALNetworkingResponse *response) {
             
             @strongify(self);
-            if(cache) {
+            if(cache && !response.error) {
                 [[RACScheduler scheduler] schedule:^{
                     
                     // 确认不是取缓存的响应体

@@ -33,6 +33,10 @@
 /** 请求体类型 默认二进制形式 */
 @property (nonatomic, assign) ALNetworkRequestParamsType   paramsType;
 
+/** 忽视自定义响应类 */
+@property (nonatomic, assign) BOOL                          ignoreCustomResponseClass;
+
+
 
 #pragma mark - 方便输出直观的请求状况的成员属性
 

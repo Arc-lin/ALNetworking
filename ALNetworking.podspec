@@ -16,7 +16,7 @@ Pod::Spec.new do |s|
   #
 
   s.name         = "ALNetworking"
-  s.version      = "1.0.0"
+  s.version      = "1.0.3"
   s.summary      = "A networking framework , encapsulation of AFNetworking3.0,ReactiveCocoa2.5,YYCache,YYModel"
 
   # This description is used to generate tags and improve search results.
@@ -85,7 +85,7 @@ Pod::Spec.new do |s|
   #  Supports git, hg, bzr, svn and HTTP.
   #
 
-  s.source       = { :git => "https://github.com/Arc-lin/ALNetworking.git", :tag => "1.0.1" }
+  s.source       = { :git => "https://github.com/Arc-lin/ALNetworking.git", :tag => s.version.to_s }
 
 
   # ――― Source Code ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
