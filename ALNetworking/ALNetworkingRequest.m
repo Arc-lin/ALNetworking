@@ -61,26 +61,26 @@
     if(self.cacheStrategy) {
         switch (self.cacheStrategy) {
             case ALCacheStrategy_NETWORK_ONLY:
-                return @"只从网络取数据(不缓存)";
+                return @"ALCacheStrategy_NETWORK_ONLY";
                 break;
             case ALCacheStrategy_CACHE_ONLY:
-                return @"只从本地取数据";
+                return @"ALCacheStrategy_CACHE_ONLY";
                 break;
             case ALCacheStrategy_NETWORK_AND_CACHE:
-                return @"从网络取数据后缓存";
+                return @"ALCacheStrategy_NETWORK_AND_CACHE";
                 break;
             case ALCacheStrategy_CACHE_ELSE_NETWORK:
-                return @"先取缓存,如果没有数据的话,才从网络取数据";
+                return @"ALCacheStrategy_CACHE_ELSE_NETWORK";
                 break;
             case ALCacheStrategy_CACHE_THEN_NETWORK:
-                return @"先取缓存,再加载网络数据";
+                return @"ALCacheStrategy_CACHE_THEN_NETWORK";
                 break;
             case ALCacheStrategy_AUTOMATICALLY:
-                return @"根据网络状况自动选择,有网选择网络数据,无网选择本地数据";
+                return @"ALCacheStrategy_AUTOMATICALLY";
                 break;
         }
     }
-    return @"只从网络取数据(不缓存)";
+    return @"ALCacheStrategy_NETWORK_ONLY";
 }
 
 @end

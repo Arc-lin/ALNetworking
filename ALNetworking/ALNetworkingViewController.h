@@ -18,20 +18,20 @@
 
 @interface ALNetworkingHistoryTableViewController : UITableViewController
 
-/** 隐藏控制器 */
+/** Dismiss controller */
 - (void)dismiss;
 
-/** 清空历史记录 */
+/** Clear all the histories */
 - (void)trash;
 
 @end
 
 @interface ALNetworkingWebViewController : UIViewController
 
-/** html字符串 */
+/** html String */
 @property (nonatomic, copy) NSString *html;
 
-/** 隐藏控制器 */
+/** Dismiss controller */
 - (void)dismiss;
 
 @end

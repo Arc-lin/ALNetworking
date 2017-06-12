@@ -11,17 +11,17 @@
 
 @class ALNetworkingRequest,ALNetworkingResponse;
 
-/* 请求回调 */
+/* Callback block */
 typedef void (^ALHTTPCallBackBlock)(ALNetworkingRequest *request,ALNetworkingResponse *response);
 
 @interface ALNetworkingBaseManager : NSObject
 
 /**
- 发送一个请求
+ Send a request
 
- @param request 请求体
- @param block   回调
- @return        请求任务
+ @param request Request body
+ @param block   Callback
+ @return        Reqeust Task
  */
 + (NSURLSessionTask *)requestForRequest:(ALNetworkingRequest *)request reponseBlock:(ALHTTPCallBackBlock)block config:(ALNetworkingConfig *)config;
 

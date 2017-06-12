@@ -35,14 +35,14 @@ static ALNetworkingCache *_manager;
 
 - (void)setObject:(id<NSCoding>)object forRequestUrl:(NSString *)url params:(NSDictionary *)params
 {
-    // 生成Key
+    // Generate Key
     NSString *key = [self base64:[NSString stringWithFormat:@"%@?%@",url,[self dic2Params:params]]];
     [self.cache setObject:object forKey:key];
 }
 
 - (ALNetworkingResponse *)responseForRequestUrl:(NSString *)url params:(NSDictionary *)params
 {
-    // 生成Key
+    // Generate Key
     NSString *key = [self base64:[NSString stringWithFormat:@"%@?%@",url,[self dic2Params:params]]];
     return (ALNetworkingResponse *)[self.cache objectForKey:key];
 }
@@ -52,7 +52,7 @@ static ALNetworkingCache *_manager;
     return [self.cache removeAllObjects];
 }
 
-// 编码base64
+// base64 encode
 - (NSString *)base64:(NSString *)rawString
 {
     NSData   *data          = [rawString dataUsingEncoding:NSUTF8StringEncoding];
@@ -60,24 +60,22 @@ static ALNetworkingCache *_manager;
     return base64Endcode;
 }
 
-// 解码base64
+// base64 decode
 - (NSString *)encodeBase64:(NSString *)base64Str
 {
-    // 解码base64
     NSData   *data            = [[NSData alloc] initWithBase64EncodedString:base64Str options:0];
     NSString *base64DecodeStr = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
     
     return base64DecodeStr;
 }
 
-// 字典转参数字符串
+// Dictionary to parameters
 - (NSString *)dic2Params:(NSDictionary *)paramsDic
 {
     if(!paramsDic) return @"";
     
     NSMutableString *paramsStr = [NSMutableString string];
     
-    // 遍历字典
     NSArray *keys = paramsDic.allKeys;
     
     for (NSInteger i = 0 ; i < keys.count ; i++) {

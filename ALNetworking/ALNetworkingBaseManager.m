@@ -39,9 +39,10 @@
     
     AFHTTPSessionManager   *mgr    = [AFHTTPSessionManager manager];
     
-    // 设置接受的返回值类型
+    // Setting accetable content types
     [mgr.responseSerializer setAcceptableContentTypes:[NSSet setWithObjects:@"application/json",@"text/html",@"text/json", @"text/javascript",@"text/plain",nil]];
-    // 设置安全策略
+    
+    // Setting sequrity policy
     if (config.sslCerPath) {
         AFSecurityPolicy *securityPolicy        = [AFSecurityPolicy policyWithPinningMode:AFSSLPinningModeCertificate];
         securityPolicy.pinnedCertificates       = [NSSet setWithObject:[NSData dataWithContentsOfFile:config.sslCerPath]];
@@ -51,18 +52,20 @@
     }
 
     AFHTTPRequestSerializer *requestSerializer = mgr.requestSerializer;
-    // 是否以JSON请求
+    
+    // Request by json type
     if(request.paramsType == ALNetworkRequestParamsTypeJSON) {
         requestSerializer = [AFJSONRequestSerializer serializer];
     }
-    // 设置请求头
+    
+    // Set request header
     if (request.header && request.header.allKeys.count > 0) {
         [request.header enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull key, id obj, BOOL * _Nonnull stop) {
             [requestSerializer setValue:obj forHTTPHeaderField:key];
         }];
     }
     
-    // 设置超时时间
+    // Set timeout interval
     requestSerializer.timeoutInterval = config.timeoutInterval;
     
     mgr.requestSerializer = requestSerializer;

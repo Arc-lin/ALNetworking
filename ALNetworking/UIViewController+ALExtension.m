@@ -54,7 +54,7 @@
     NSString *className = NSStringFromClass(self.class);
     if([ALNetworking sharedInstance].config.debugMode &&
        ![className isEqualToString:@"ALNetworkingHistoryTableViewController"] &&
-       ![className isEqualToString:@"ALNetworkingWebViewController"]) { // 如果是调试模式的话才可以弹出
+       ![className isEqualToString:@"ALNetworkingWebViewController"]) { // 如果是调试模式的话才可以弹出  Pop if Debug mode is YES
         ALNetworkingViewController *vc = [[ALNetworkingViewController alloc] initWithHistoryViewController];
         vc.modalPresentationStyle = UIModalPresentationFormSheet;
         [self presentViewController:vc animated:YES completion:nil];

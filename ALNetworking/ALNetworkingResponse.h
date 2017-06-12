@@ -11,12 +11,15 @@
 @interface ALNetworkingResponse : NSObject<NSCoding>
 
 /** 原始数据 */
+/** Raw Data, comes from AFNetworking directly */
 @property (nonatomic, strong) id rawData;
 
 /** 网络异常错误 */
+/** Network error */
 @property (nonatomic, strong) NSError *error;
 
 /** 是否是取缓存的响应 */
+/** If comes from cahce */
 @property (nonatomic, assign) BOOL isCache;
 
 @end

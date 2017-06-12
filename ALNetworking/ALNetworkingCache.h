@@ -12,31 +12,31 @@
 
 @interface ALNetworkingCache : NSObject
 
-/** 单例方法 */
+/** Singleton */
 + (instancetype)defaultManager;
 
 /**
- 存缓存
+ Save to disk cache
 
  @param object ALNetworkingResponse
  @param url url
- @param params 请求参数
+ @param params Parameters
  */
 - (void)setObject:(id<NSCoding>)object forRequestUrl:(NSString *)url params:(NSDictionary *)params;
 
 
 /**
- 取缓存
+ Get from disk cache
 
- @param url 请求的API地址
- @param params 请求的参数
- @return 返回响应体
+ @param url API address
+ @param params Parameters
+ @return Response body
  */
 - (ALNetworkingResponse *)responseForRequestUrl:(NSString *)url params:(NSDictionary *)params;
 
 
 /**
- 清空缓存
+ Clear the caches
  */
 - (void)removeAllObjects;
 

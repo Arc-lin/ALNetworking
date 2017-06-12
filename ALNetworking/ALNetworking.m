@@ -19,23 +19,23 @@
 
 @interface ALNetworking ()
 
-/** 缓存 */
+/** Cache */
 @property (nonatomic, strong) ALNetworkingCache   *cache;
 
-/** 请求体 */
+/** Request Body */
 @property (nonatomic, strong) ALNetworkingRequest *request;
 
-/** 响应错误的回调 */
+/** Error Subject */
 @property (nonatomic, strong) RACSubject *errors;
 
-/** 请求的历史 */
+/** Histories */
 @property (nonatomic, strong) NSMutableArray *requestHistories;
 
 @end
 
 @implementation ALNetworking
 
-#pragma mark - 单例
+#pragma mark - Singleton
 
 static ALNetworking *_networking;
 
@@ -56,7 +56,7 @@ static ALNetworking *_networking;
     return _networking;
 }
 
-#pragma mark - 链式方法的实现
+#pragma mark - Chain
 
 - (ALNetworking *(^)(ALNetworkRequestMethod))method
 {
@@ -135,7 +135,7 @@ static ALNetworking *_networking;
 }
 
 
-#pragma mark - 发送请求
+#pragma mark - Send Request
 
 - (RACSignal *)handleRequest:(ALNetworkingRequest *)request
 {
@@ -145,18 +145,18 @@ static ALNetworking *_networking;
     RACSignal *requestSignal;
     @weakify(self);
     switch (request.cacheStrategy) {
-        case ALCacheStrategy_CACHE_ONLY: // 只请求缓存
+        case ALCacheStrategy_CACHE_ONLY: // Only Request Cache
             requestSignal = [self cacheWithRequest:request];
             break;
-        case ALCacheStrategy_NETWORK_ONLY: // 只请求网络
+        case ALCacheStrategy_NETWORK_ONLY: // Only Request network
             requestSignal = [self networkWithRequest:request cache:NO];
             break;
-        case ALCacheStrategy_NETWORK_AND_CACHE: // 请求网络后缓存
+        case ALCacheStrategy_NETWORK_AND_CACHE: // Request network and cache
         {
             requestSignal = [self networkWithRequest:request cache:YES];
         }
             break;
-        case ALCacheStrategy_CACHE_ELSE_NETWORK: // 取缓存无则请求网络
+        case ALCacheStrategy_CACHE_ELSE_NETWORK: // Fetch cache, if not exist, fetch network data
         {
             requestSignal = [[self cacheWithRequest:request] catch:^RACSignal *(NSError *error) {
                 @strongify(self);
@@ -164,14 +164,14 @@ static ALNetworking *_networking;
             }];
         }
             break;
-        case ALCacheStrategy_CACHE_THEN_NETWORK: // 取缓存并请求网络
+        case ALCacheStrategy_CACHE_THEN_NETWORK: // Get cache and fetch network data
         {
             requestSignal = [[[self cacheWithRequest:request] catch:^RACSignal *(NSError *error) {
                 return [RACSignal empty];
             }] concat:[self networkWithRequest:request cache:YES]];
         }
             break;
-        case ALCacheStrategy_AUTOMATICALLY: // 网络异常则取缓存
+        case ALCacheStrategy_AUTOMATICALLY: // If network exception, then fetch cache
         {
             requestSignal = [[self networkWithRequest:request cache:YES] catch:^RACSignal *(NSError *error) {
                 @strongify(self);
@@ -186,12 +186,18 @@ static ALNetworking *_networking;
     return [[[requestSignal map:^id(RACTuple *value) {
         @strongify(self);
         // 如果有设置并且不忽略自定义响应体类
+        // if there has custom response class and not ignore it
         if (self.config.customRespClazz) {
             ALNetworkingRequest  *req  = value.first;
             ALNetworkingResponse *resp = value.second;
             if(req.ignoreCustomResponseClass) return RACTuplePack(req,resp);
             
             id customResponse = [self.config.customRespClazz yy_modelWithDictionary:resp.rawData];
+            if ([customResponse isKindOfClass:[ALNetworkingResponse class]]) {
+                ((ALNetworkingResponse *)customResponse).error = resp.error;
+                ((ALNetworkingResponse *)customResponse).rawData = resp.rawData;
+                ((ALNetworkingResponse *)customResponse).isCache = resp.isCache;
+            }
             return RACTuplePack(req,customResponse);
         }
         return value;
@@ -199,24 +205,28 @@ static ALNetworking *_networking;
         @strongify(self);
         
         // 检查服务器是否有返回错误页面代码
+        // Check whether server has return the error page code
         if(self.config.debugMode && [error.userInfo.allKeys containsObject:@"NSUnderlyingError"]) {
             NSError *underlyingError = error.userInfo[@"NSUnderlyingError"];
             if ([underlyingError.userInfo.allKeys containsObject:@"com.alamofire.serialization.response.error.data"]) {
                 NSString *htmlStr = [[NSString alloc] initWithData:underlyingError.userInfo[@"com.alamofire.serialization.response.error.data"] encoding:NSUTF8StringEncoding];
                 ALNetworkingViewController *vc = [[ALNetworkingViewController alloc] initWithWebViewControllerWithHtmlStr:htmlStr];
                 // 弹出窗口
+                // pop the window
                 [[UIApplication sharedApplication].keyWindow.rootViewController presentViewController:vc animated:YES completion:nil];
             }
         }
         
         self.config.customLog([NSString stringWithFormat:@"Request Error : %@",error]);
         // 发送信号告知错误
+        // Send error to call front-end error
         [self.errors sendNext:self.config.handleError(error)];
         return [RACSignal empty];
     }];
 }
 
 // 通过请求体取出缓存中的响应体
+// Get cache through request
 - (RACSignal *)cacheWithRequest:(ALNetworkingRequest *)request
 {
     RACSignal *cacheSignal = [RACSignal createSignal:^RACDisposable *(id<RACSubscriber> subscriber) {
@@ -226,10 +236,10 @@ static ALNetworking *_networking;
                 [subscriber sendError:KERROR(-99, @"NO CACHE")];
             } else {
                 
-                // 确认是取缓存的响应体
+                // Confirm is get from cache(for Display)
                 response.isCache = YES;
                 
-                // 添加进入历史记录中
+                // Add to history
                 [self.requestHistories addObject:RACTuplePack([NSDate date],request,response)];
                 
                 [subscriber sendNext:RACTuplePack(request,response)];
@@ -242,6 +252,7 @@ static ALNetworking *_networking;
 }
 
 // 网络请求
+// Get data from server through request
 - (RACSignal *)networkWithRequest:(ALNetworkingRequest *)request cache:(BOOL)cache
 {
     @weakify(self);
@@ -253,15 +264,15 @@ static ALNetworking *_networking;
             if(cache && !response.error) {
                 [[RACScheduler scheduler] schedule:^{
                     
-                    // 确认不是取缓存的响应体
+                    // Confirm isn't get from cache(for Display)
                     response.isCache = NO;
                     
-                    // 把请求结果写入缓存
+                    // Save request result into disk cache
                     [self.cache setObject:response forRequestUrl:request.urlStr params:request.params];
                 }];
             }
 
-            // 添加进入历史记录中
+            // Add to history
             [self.requestHistories addObject:RACTuplePack([NSDate date],request,response)];
             
             if (response.error) {
@@ -277,7 +288,7 @@ static ALNetworking *_networking;
     return requestSignal;
 }
 
-#pragma mark - 网络状态
+#pragma mark - Network Status
 
 + (void)networkStatus:(void (^)(ALNetworkReachabilityStatus))statusBlock
 {
@@ -285,7 +296,6 @@ static ALNetworking *_networking;
     
     AFNetworkReachabilityManager *mgr = [AFNetworkReachabilityManager sharedManager];
     [mgr setReachabilityStatusChangeBlock:^(AFNetworkReachabilityStatus status) {
-        // 当网络状态发生改变的时候调用这个block
         switch (status) {
             case AFNetworkReachabilityStatusReachableViaWiFi:
                 statusBlock(ALNetworkReachabilityStatusReachableViaWiFi);
@@ -306,11 +316,11 @@ static ALNetworking *_networking;
                 break;
         }
     }];
-    // 开始监控
+    // Start Monitoring
     [mgr startMonitoring];
 }
 
-#pragma mark - 清空历史
+#pragma mark - Clear the histories
 
 - (void)clearHistories
 {

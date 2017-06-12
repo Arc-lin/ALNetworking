@@ -18,7 +18,7 @@ static ALNetworkingConfig *_configure;
 - (instancetype)init
 {
     if (self = [super init]) {
-        // 设置默认值
+        // Set Default Value
         self.timeoutInterval   = 30;
         self.defaultHeader     = @{};
         self.defaultParams     = @{};
@@ -40,14 +40,14 @@ static ALNetworkingConfig *_configure;
 
 - (void)setSslCerPath:(NSString *)sslCerPath
 {
-    NSAssert(sslCerPath != nil, @"SSL证书路径不能传空值");
+    NSAssert(sslCerPath != nil, @"SSL PATH Could not be nil");
     
     NSFileManager *manager = [NSFileManager defaultManager];
     if([manager fileExistsAtPath:sslCerPath]) {
         _sslCerPath = sslCerPath;
     }else {
         
-        if(self.customLog) self.customLog(@"SSL证书路径不存在");
+        if(self.customLog) self.customLog(@"SSL PATH NOT EXIST");
         
         _sslCerPath = nil;
     }

@@ -21,46 +21,46 @@
 
 @interface ALNetworking : NSObject
 
-/** 单例 */
+/** Singleton */
 + (instancetype)sharedInstance;
 
-/** 监听网络状态 */
+/** Observer the network status */
 + (void)networkStatus:(void(^)(ALNetworkReachabilityStatus networkStatus))statusBlock;
 
-/** 请求方法 */
+/** Request method */
 - (ALNetworking * (^)(ALNetworkRequestMethod metohd))method;
 
-/** 带URL前缀（如果有的话）的url */
+/** Request an url with prefix */
 - (ALNetworking * (^)(NSString *url))url;
 
-/** 不带前缀的url */
+/** Request an url without prefix */
 - (ALNetworking * (^)(NSString *url))url_x;
 
-/** 请求头 */
+/** Request Header  */
 - (ALNetworking * (^)(NSDictionary *header))header;
 
-/** 请求策略 */
+/** Cache Strategy */
 - (ALNetworking * (^)(ALCacheStrategy strategy))cacheStrategy;
 
-/** 请求参数 */
+/** Reqeust params */
 - (ALNetworking * (^)(NSDictionary *params))params;
 
-/** 请求方式 */
+/** Request method */
 - (ALNetworking * (^)(ALNetworkRequestParamsType requestType))paramsType;
 
-/** 发送请求 */
+/** Send Resquest */
 - (RACSignal *(^)())executeSignal;
 
-/** 清空历史 */
+/** Empty the history */
 - (void)clearHistories;
 
-/** 配置信息 */
+/** Configure Message */
 @property (nonatomic, strong) ALNetworkingConfig *config;
 
-/** 异常状况(服务端返回非正确码和网络异常时回调) */
+/** When the server callback the error code and network exceptions, it will send value, you can subscribe it on viewController */
 @property (nonatomic, strong, readonly) RACSubject *errors;
 
-/** 请求历史 */
+/** Request histories */
 @property (nonatomic, strong, readonly) NSMutableArray *requestHistories;
 
 @end

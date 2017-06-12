@@ -10,11 +10,12 @@
 
 @interface ALNetworkingConst : NSObject
 
-/** 便利构造请求参数(字典) */
+/** Build parameters (NSDictionary) expediently */
 #define paramsDic(...) params(NSDictionaryOfVariableBindings(__VA_ARGS__))
 
-/** 构造简单的请求 */
+/** Build request expediently */
 /** 带自定义url前缀 */
+/** With url Prefix */
 #define get(urlStr,...)       url(urlStr).method(ALNetworkRequestMethodGET).params(NSDictionaryOfVariableBindings(__VA_ARGS__))
 #define post(urlStr,...)      url(urlStr).method(ALNetworkRequestMethodGET).params(NSDictionaryOfVariableBindings(__VA_ARGS__))
 #define put(urlStr,...)       url(urlStr).method(ALNetworkRequestMethodPUT).params(NSDictionaryOfVariableBindings(__VA_ARGS__))
@@ -22,6 +23,7 @@
 #define patch(urlStr,...)     url(urlStr).method(ALNetworkRequestMethodPATCH).params(NSDictionaryOfVariableBindings(__VA_ARGS__))
 
 /** 不带自定义url前缀 */
+/** Without url Prefix */
 #define get_x(urlStr,...)     url_x(urlStr).method(ALNetworkRequestMethodGET).params(NSDictionaryOfVariableBindings(__VA_ARGS__))
 #define post_x(urlStr,...)    url_x(urlStr).method(ALNetworkRequestMethodGET).params(NSDictionaryOfVariableBindings(__VA_ARGS__))
 #define put_x(urlStr,...)     url_x(urlStr).method(ALNetworkRequestMethodPUT).params(NSDictionaryOfVariableBindings(__VA_ARGS__))
@@ -29,13 +31,13 @@
 #define patch_x(urlStr,...)   url_x(urlStr).method(ALNetworkRequestMethodPATCH).params(NSDictionaryOfVariableBindings(__VA_ARGS__))
 
 /**
- 请求的方式
+ Requst metohd
  
- - ALNetworkRequestMethodGET:                 GET请求
- - ALNetworkRequestMethodPOST:                POST请求
- - ALNetworkRequestMethodPUT:                 PUT请求
- - ALNetworkRequestMethodPATCH:               PATCH请求
- - ALNetworkRequestMethodDELETE:              DELETE请求
+ - ALNetworkRequestMethodGET:                 GET
+ - ALNetworkRequestMethodPOST:                POST
+ - ALNetworkRequestMethodPUT:                 PUT
+ - ALNetworkRequestMethodPATCH:               PATCH
+ - ALNetworkRequestMethodDELETE:              DELETE
  */
 typedef NS_ENUM(NSInteger, ALNetworkRequestMethod) {
     ALNetworkRequestMethodGET                  = 0,
@@ -47,12 +49,12 @@ typedef NS_ENUM(NSInteger, ALNetworkRequestMethod) {
 
 
 /**
- 网络状态
+ Network Status
  
- - ALNetworkReachabilityStatusUnknown:          未知状态
- - ALNetworkReachabilityStatusNotReachable:     网络不可用
- - ALNetworkReachabilityStatusReachableViaWWAN: WLAN 网络
- - ALNetworkReachabilityStatusReachableViaWiFi: WIFI 网络
+ - ALNetworkReachabilityStatusUnknown:          Unknow
+ - ALNetworkReachabilityStatusNotReachable:     Network cannot be used
+ - ALNetworkReachabilityStatusReachableViaWWAN: WLAN
+ - ALNetworkReachabilityStatusReachableViaWiFi: WIFI
  */
 typedef NS_ENUM(NSInteger, ALNetworkReachabilityStatus) {
     ALNetworkReachabilityStatusUnknown          = -1,
@@ -62,10 +64,10 @@ typedef NS_ENUM(NSInteger, ALNetworkReachabilityStatus) {
 };
 
 /**
- 请求参数的类型
+ Request Type
  
- - ALNetworkRequestParamsTypeDictionary:      以字典(二进制)方式请求 (默认)
- - ALNetworkRequestParamsTypeJSON:            以JSON方式请求
+ - ALNetworkRequestParamsTypeDictionary:      Dictionary(Binary)
+ - ALNetworkRequestParamsTypeJSON:            JSON
  */
 typedef NS_ENUM(NSInteger, ALNetworkRequestParamsType) {
     ALNetworkRequestParamsTypeDictionary        = 0,
@@ -73,14 +75,14 @@ typedef NS_ENUM(NSInteger, ALNetworkRequestParamsType) {
 };
 
 /**
- 网络缓存策略
+ Network Cache Strategy
 
- - ALCacheStrategy_NETWORK_ONLY: 只从网络取数据(不缓存)
- - ALCacheStrategy_CACHE_ONLY: 只从本地取数据
- - ALCacheStrategy_NETWORK_AND_CACHE: 从网络取数据后缓存
- - ALCacheStrategy_CACHE_ELSE_NETWORK: 先取缓存,如果没有数据的话,才从网络取数据
- - ALCacheStrategy_CACHE_THEN_NETWORK: 先取缓存,再加载网络数据,网络数据加载完会更新缓存,这个选择会有两次回调 （或者收到两个信号值)
- - ALCacheStrategy_AUTOMATICALLY: 根据网络状况自动选择,先请求一遍网络,如果网络异常就返回本地缓存的内容
+ - ALCacheStrategy_NETWORK_ONLY:             只从网络取数据(不缓存)   Only from network
+ - ALCacheStrategy_CACHE_ONLY:               只从本地取数据          Only from disk cache
+ - ALCacheStrategy_NETWORK_AND_CACHE:        从网络取数据后缓存       Get from network then cache
+ - ALCacheStrategy_CACHE_ELSE_NETWORK:       先取缓存,如果没有数据的话,才从网络取数据  Get from cache, if not exist,get from network
+ - ALCacheStrategy_CACHE_THEN_NETWORK:       先取缓存,再加载网络数据,网络数据加载完会更新缓存,这个选择会有两次回调 （或者收到两个信号值) Get from cache,then network,this option will send data twice.
+ - ALCacheStrategy_AUTOMATICALLY:            根据网络状况自动选择,先请求一遍网络,如果网络异常就返回本地缓存的内容 Request from network ,if exception,get from disk cache
  */
 typedef NS_ENUM(NSInteger,ALCacheStrategy) {
     ALCacheStrategy_NETWORK_ONLY            = 0,

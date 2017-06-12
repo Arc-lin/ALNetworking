@@ -6,6 +6,7 @@ ALNetworking
 [![Platform info](https://img.shields.io/cocoapods/p/ALNetworking.svg?style=flat)](http://cocoadocs.org/docsets/ALNetworking)
 ![Platform version](https://img.shields.io/badge/iOS_Version->8.0-red.svg)
 
+[English Version](#jump)
 
 ## 这是什么
 
@@ -168,6 +169,8 @@ ALNetworking 使用的是MIT证书,详情见LICENSE文件.
 ---
 ---
 
+<span id="jump"></span>
+
 ## What
 
 ALNetworking is a networking framework base on AFNetworking. __Only use for ReactiveCocoa environment__. Develop by personal developer.
@@ -254,6 +257,7 @@ and so on.
 
 __Some configure message is write on AppDelegate,please download the Demo to check__
 
+__There are more messages in the demo , please download the demo and read it__
 
 ### example1 (Without url prefix)
 
