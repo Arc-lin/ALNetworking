@@ -58,6 +58,11 @@ static ALNetworkingConfig *_configure;
     // 没有值的时候返回空字符串而不是nil
     if (!_urlPerfix) {
         return @"";
+    } else {
+        // 如果最后一位是 '/'的话，就剪掉
+        if ([[_urlPerfix substringFromIndex:_urlPerfix.length - 1] isEqualToString:@"/"]) {
+            _urlPerfix = [_urlPerfix substringToIndex:_urlPerfix.length - 1];
+        }
     }
     return _urlPerfix;
 }

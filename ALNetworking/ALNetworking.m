@@ -69,6 +69,10 @@ static ALNetworking *_networking;
 - (ALNetworking *(^)(NSString *))url
 {
     return ^ALNetworking *(NSString *url){
+        // 剪掉最前面的 "/"
+        if ([[url substringToIndex:1] isEqualToString:@"/"]) {
+            url = [url substringFromIndex:1];
+        }
         self.request.urlStr = [NSString stringWithFormat:@"%@/%@",self.config.urlPerfix,url];
         self.request.ignoreCustomResponseClass = NO;
         return self;
