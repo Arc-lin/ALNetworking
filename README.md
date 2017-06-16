@@ -72,6 +72,8 @@ ALNetworking 是基于AFNetworking 3.x 的. 更多详情看[AFNetworking README]
 
 ## 怎么用
 
+__这里有一个[简单的MVVM+RAC使用示例](https://github.com/Arc-lin/ALMVVMDemo)__
+
 ### url() & url_x()
 
 `url()`   : 请求的时候会在该内容前面加上一个自定义的前缀拼成Url
@@ -228,6 +230,8 @@ ALNetworking is based on AFNetworking. You can find more detail about version co
 ```
 
 ## How to use
+
+__Here has a simple example for [MVVM+RAC](https://github.com/Arc-lin/ALMVVMDemo)__
 
 ### url() & url_x()
 
