@@ -27,14 +27,14 @@
     
     [SVProgressHUD setMaximumDismissTimeInterval:1.0f];
     
-    // 示例1 : 淘宝接口:不使用配置好的前缀.有请求参数 EXAMPLE 1 : NO URL PREFIX
+    // 示例1 : EXAMPLE 1
     @weakify(self);
     [[self.btn1 rac_signalForControlEvents:UIControlEventTouchUpInside] subscribeNext:^(id x) {
         @strongify(self);
         [self example1];
     }];
    
-    // 示例2 : 使用配置好的前缀 EXAMPLE 2 : HAS URL PERFIX
+    // 示例2 : EXAMPLE 2
     [[self.btn2 rac_signalForControlEvents:UIControlEventTouchUpInside] subscribeNext:^(id x) {
         @strongify(self);
         [self example2];
@@ -68,13 +68,9 @@
      3. Custom response class should be inherit from ALNetworkingResponse
      */
     
-    
-    // Below Code Not Use url Perfix
-    // 下面的示例代码不使用url前缀
-    
     // 写法1
     RACSignal *example1 = self.networking
-                              .url_x(@"http://ip.taobao.com/service/getIpInfo.php")
+                              .url(@"http://ip.taobao.com/service/getIpInfo.php")
                               .params(@{@"ip":@"192.168.0.103"})
                               .executeSignal();
     
@@ -82,14 +78,14 @@
     // Use NSDictionaryOfVariableBindings() object key as key, object value as value ,generate a dictionary
     NSString *ip = @"192.168.0.103";
     RACSignal *example1_1 = self.networking
-                                .url_x(@"http://ip.taobao.com/service/getIpInfo.php")
+                                .url(@"http://ip.taobao.com/service/getIpInfo.php")
                                 .paramsDic(ip)
                                 .executeSignal();
     
     // 写法3 针对不同类型的请求,可以设定请求方式和请求体类型
     // Setting different request method and different type of parameters
     RACSignal *example1_2 = self.networking
-                                .url_x(@"http://ip.taobao.com/service/getIpInfo.php")
+                                .url(@"http://ip.taobao.com/service/getIpInfo.php")
                                 .paramsDic(ip)
                                 .paramsType(ALNetworkRequestParamsTypeJSON)
                                 .method(ALNetworkRequestMethodGET)
@@ -100,7 +96,7 @@
     // Use marco to save your code!  url(xxx).paramsDic(a,b).method(ALNetworkRequestMethodGET) ===> get(xxx,a,b)
     
     RACSignal *example1_3 = self.networking
-                                .get_x(@"http://ip.taobao.com/service/getIpInfo.php",ip)
+                                .get(@"http://ip.taobao.com/service/getIpInfo.php",ip)
                                 .paramsType(ALNetworkRequestParamsTypeJSON)
                                 .executeSignal();
     

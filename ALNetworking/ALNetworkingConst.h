@@ -14,21 +14,12 @@
 #define paramsDic(...) params(NSDictionaryOfVariableBindings(__VA_ARGS__))
 
 /** Build request expediently */
-/** 带自定义url前缀 */
-/** With url Prefix */
+
 #define get(urlStr,...)       url(urlStr).method(ALNetworkRequestMethodGET).params(NSDictionaryOfVariableBindings(__VA_ARGS__))
 #define post(urlStr,...)      url(urlStr).method(ALNetworkRequestMethodGET).params(NSDictionaryOfVariableBindings(__VA_ARGS__))
 #define put(urlStr,...)       url(urlStr).method(ALNetworkRequestMethodPUT).params(NSDictionaryOfVariableBindings(__VA_ARGS__))
 #define delete(urlStr,...)    url(urlStr).method(ALNetworkRequestMethodDELETE).params(NSDictionaryOfVariableBindings(__VA_ARGS__))
 #define patch(urlStr,...)     url(urlStr).method(ALNetworkRequestMethodPATCH).params(NSDictionaryOfVariableBindings(__VA_ARGS__))
-
-/** 不带自定义url前缀 */
-/** Without url Prefix */
-#define get_x(urlStr,...)     url_x(urlStr).method(ALNetworkRequestMethodGET).params(NSDictionaryOfVariableBindings(__VA_ARGS__))
-#define post_x(urlStr,...)    url_x(urlStr).method(ALNetworkRequestMethodGET).params(NSDictionaryOfVariableBindings(__VA_ARGS__))
-#define put_x(urlStr,...)     url_x(urlStr).method(ALNetworkRequestMethodPUT).params(NSDictionaryOfVariableBindings(__VA_ARGS__))
-#define delete_x(urlStr,...)  url_x(urlStr).method(ALNetworkRequestMethodDELETE).params(NSDictionaryOfVariableBindings(__VA_ARGS__))
-#define patch_x(urlStr,...)   url_x(urlStr).method(ALNetworkRequestMethodPATCH).params(NSDictionaryOfVariableBindings(__VA_ARGS__))
 
 /**
  Requst metohd

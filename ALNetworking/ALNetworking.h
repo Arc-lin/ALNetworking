@@ -30,11 +30,8 @@
 /** Request method */
 - (ALNetworking * (^)(ALNetworkRequestMethod metohd))method;
 
-/** Request an url with prefix */
+/** Request an url with prefix (If not include 'http://' or 'https://') */
 - (ALNetworking * (^)(NSString *url))url;
-
-/** Request an url without prefix */
-- (ALNetworking * (^)(NSString *url))url_x;
 
 /** Request Header  */
 - (ALNetworking * (^)(NSDictionary *header))header;

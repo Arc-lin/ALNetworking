@@ -73,17 +73,14 @@ static ALNetworking *_networking;
         if ([[url substringToIndex:1] isEqualToString:@"/"]) {
             url = [url substringFromIndex:1];
         }
-        self.request.urlStr = [NSString stringWithFormat:@"%@/%@",self.config.urlPerfix,url];
-        self.request.ignoreCustomResponseClass = NO;
-        return self;
-    };
-}
-
-- (ALNetworking *(^)(NSString *))url_x
-{
-    return ^ALNetworking *(NSString *url){
-        self.request.urlStr = url;
-        self.request.ignoreCustomResponseClass = YES;
+        // 通过判断有没有http:// 或者 https:// 前缀去决定是否要使用url前缀 , 如果这种做法处理不当的话请告知我
+        if ([url hasPrefix:@"http://"] || [url hasPrefix:@"https://"]) {
+            self.request.urlStr = url;
+            self.request.ignoreCustomResponseClass = YES;
+        } else {
+            self.request.urlStr = [NSString stringWithFormat:@"%@/%@",self.config.urlPerfix,url];
+            self.request.ignoreCustomResponseClass = NO;
+        }
         return self;
     };
 }

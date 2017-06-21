@@ -11,7 +11,7 @@ ALNetworking
 ## 这是什么
 
 ALNetworking 是一个基于AFNetworking的框架. __只能基于ReactiveCocoa(2.5版本)环境下使用__.
-只能在Objective-C语言下使用.
+
 
 ## 特性
 
@@ -74,11 +74,9 @@ ALNetworking 是基于AFNetworking 3.x 的. 更多详情看[AFNetworking README]
 
 __这里有一个[简单的MVVM+RAC使用示例](https://github.com/Arc-lin/ALMVVMDemo)__
 
-### url() & url_x()
+### url() 
 
-`url()`   : 请求的时候会在该内容前面加上一个自定义的前缀拼成Url
-
-`url_x()` : 请求的时候直接用该内容作为url
+`url()`   : 请求的时候会在该内容前面加上一个自定义的前缀拼成Url,如果有`https://` 或者 `http://`前缀的话,就不会拼上自定义的前缀,如果这种处理方式不当的话请告知我
 
 ### params() & paramsDic()
 
@@ -90,19 +88,14 @@ __这里有一个[简单的MVVM+RAC使用示例](https://github.com/Arc-lin/ALMV
 
 同样道理
 
-带url前缀
-
 `url(xxx).paramsDic(a,b).method(ALNetworkRequestMethodPOST)` 也可以写成 `post(xxx,a,b)` 
 
-不带url前缀
 
-`url_x(xxx).paramsDic(a,b).method(ALNetworkRequestMethodPOST)` 也可以写成 `post_x(xxx,a,b)` 
-
-and so on. 
+等等
 
 __一些配置信息写在了AppDelegate,请下载Demo查看__
 
-### example1 (不使用自定义的前缀)
+### example1 
 
 ```
  // example1
@@ -141,7 +134,7 @@ __一些配置信息写在了AppDelegate,请下载Demo查看__
 
 ```
 
-### 示例2 (使用自定义的前缀,然后我们来试试使用缓存策略)
+### 示例2 (试试使用缓存策略)
 ```
 NSString *Id = @"1";
 NSString *name = @"22";
@@ -233,11 +226,9 @@ ALNetworking is based on AFNetworking. You can find more detail about version co
 
 __Here has a simple example for [MVVM+RAC](https://github.com/Arc-lin/ALMVVMDemo)__
 
-### url() & url_x()
+### url()
 
-`url()`   : Combine perfix with the content as url
-
-`url_x()` : Only use conent as url
+`url()`   : Combine perfix with the content as url, if you have a prefix of `https://` or `http://`, you will not have custom prefix attached. If this is not handled properly, please let me know
 
 ### params() & paramsDic()
 
@@ -249,13 +240,8 @@ __Here has a simple example for [MVVM+RAC](https://github.com/Arc-lin/ALMVVMDemo
 
 On the same
 
-With url prefix
-
 `url(xxx).paramsDic(a,b).method(ALNetworkRequestMethodPOST)` can be written as `post(xxx,a,b)` 
 
-Without url prefix
-
-`url_x(xxx).paramsDic(a,b).method(ALNetworkRequestMethodPOST)` can be written as `post_x(xxx,a,b)` 
 
 and so on. 
 
@@ -263,7 +249,7 @@ __Some configure message is write on AppDelegate,please download the Demo to che
 
 __There are more messages in the demo , please download the demo and read it__
 
-### example1 (Without url prefix)
+### example1
 
 ```
  // example1
@@ -302,7 +288,7 @@ __There are more messages in the demo , please download the demo and read it__
 
 ```
 
-### example2 (With url prefix, try to use cache stategy)
+### example2 (Try to use cache stategy)
 ```
 NSString *Id = @"1";
 NSString *name = @"22";
