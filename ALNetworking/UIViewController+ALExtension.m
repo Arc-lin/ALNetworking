@@ -37,15 +37,23 @@
     
     UIGestureRecognizer *customGesture = [ALNetworking sharedInstance].config.gesture;
     
-    if(customGesture) { // 如果有自定义手势就直接添加在View上面
-        [customGesture.rac_gestureSignal subscribeNext:^(id x) {
-            [self showLoggerViewController];
-        }];
-        [self.view addGestureRecognizer:customGesture];
-    } else {
-        UILongPressGestureRecognizer *longPress = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(showLoggerViewController)];
-        longPress.minimumPressDuration = 2.0f;
-        [self.view addGestureRecognizer:longPress];
+    NSArray *controllerNames = @[@"ALNetworkingViewController",@"ALNetworkingWebViewController",@"ALNetworkingHistoryTableViewController"];
+    if ([controllerNames containsObject:NSStringFromClass([self class])]) {
+        return;
+    }
+    if(![[ALNetworking sharedInstance].config.noHistoryControllerNames containsObject:NSStringFromClass([self class])]) {
+        if(customGesture) { // 如果有自定义手势就直接添加在View上面
+                @weakify(self);
+                [customGesture.rac_gestureSignal subscribeNext:^(id x) {
+                    @strongify(self);
+                    [self showLoggerViewController];
+                }];
+                [self.view addGestureRecognizer:customGesture];
+        } else {
+            UILongPressGestureRecognizer *longPress = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(showLoggerViewController)];
+            longPress.minimumPressDuration = 2.0f;
+            [self.view addGestureRecognizer:longPress];
+        }
     }
 }
 

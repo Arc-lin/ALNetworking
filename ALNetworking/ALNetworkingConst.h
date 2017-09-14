@@ -15,8 +15,14 @@
 
 /** Build request expediently */
 
+#define GET(urlStr)       url(urlStr).method(ALNetworkRequestMethodGET)
+#define POST(urlStr)      url(urlStr).method(ALNetworkRequestMethodPOST)
+#define PUT(urlStr)       url(urlStr).method(ALNetworkRequestMethodPUT)
+#define DELETE(urlStr)    url(urlStr).method(ALNetworkRequestMethodDELETE)
+#define PATCH(urlStr)     url(urlStr).method(ALNetworkRequestMethodPATCH)
+
 #define get(urlStr,...)       url(urlStr).method(ALNetworkRequestMethodGET).params(NSDictionaryOfVariableBindings(__VA_ARGS__))
-#define post(urlStr,...)      url(urlStr).method(ALNetworkRequestMethodGET).params(NSDictionaryOfVariableBindings(__VA_ARGS__))
+#define post(urlStr,...)      url(urlStr).method(ALNetworkRequestMethodPOST).params(NSDictionaryOfVariableBindings(__VA_ARGS__))
 #define put(urlStr,...)       url(urlStr).method(ALNetworkRequestMethodPUT).params(NSDictionaryOfVariableBindings(__VA_ARGS__))
 #define delete(urlStr,...)    url(urlStr).method(ALNetworkRequestMethodDELETE).params(NSDictionaryOfVariableBindings(__VA_ARGS__))
 #define patch(urlStr,...)     url(urlStr).method(ALNetworkRequestMethodPATCH).params(NSDictionaryOfVariableBindings(__VA_ARGS__))

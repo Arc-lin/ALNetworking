@@ -104,7 +104,7 @@
     ALNetworkingWebViewController *vc = [[ALNetworkingWebViewController alloc] init];
     
     // 数据插入HTML
-    NSString *path = [[NSBundle mainBundle] pathForResource:@"ALNetworkingDetail" ofType:@"html"];
+    NSString *path = [self filesPathFromCustomBundle:@"ALNetworkingDetail"];
     __block NSString *htmlStr = [[NSString alloc] initWithContentsOfFile:path encoding:NSUTF8StringEncoding error:nil];
     
     // 处理响应体
@@ -131,6 +131,15 @@
 
 #pragma mark - private method
 
+- (NSString *)filesPathFromCustomBundle:(NSString *)fileName
+{
+    NSString *bundlePath = [[NSBundle mainBundle].resourcePath stringByAppendingPathComponent:@"ALNetworking.bundle"];
+    NSBundle *bundle = [NSBundle bundleWithPath:bundlePath];
+    NSString *file_path = [bundle pathForResource:fileName ofType:@"html"];
+    return file_path;
+}
+
+
 // 日期转字符串
 - (NSString *)dateStr:(NSDate *)date
 {
@@ -141,8 +150,8 @@
 
 - (NSString *)lastTwoCompoment:(NSString *)urlStr
 {
-    NSString *compoment = [NSString stringWithFormat:@"%@/%@",urlStr.stringByDeletingLastPathComponent.lastPathComponent,urlStr.lastPathComponent];
-    return compoment;
+    NSString *component = [NSString stringWithFormat:@"%@/%@",urlStr.stringByDeletingLastPathComponent.lastPathComponent,urlStr.lastPathComponent];
+    return component;
 }
 
 @end
@@ -150,6 +159,9 @@
 #pragma mark - 网页控制器
 
 @interface ALNetworkingWebViewController ()
+
+/** webView */
+@property (nonatomic, strong) UIWebView *webView;
 
 @end
 
@@ -161,6 +173,47 @@
     UIWebView *webView = [[UIWebView alloc] initWithFrame:[UIScreen mainScreen].bounds];
     [webView loadHTMLString:self.html baseURL:nil];
     [self.view addSubview:webView];
+    self.webView = webView;
+    
+    // 保存网页内容到相册图片
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemSave target:self action:@selector(webContentImage)];
+}
+
+- (UIImage *)webContentImage
+{
+    CGSize boundsSize = self.webView.bounds.size;
+    CGFloat boundsWidth = self.webView.bounds.size.width;
+    CGFloat boundsHeight = self.webView.bounds.size.height;
+    CGPoint offset = self.webView.scrollView.contentOffset;
+    [self.webView.scrollView setContentOffset:CGPointMake(0, 0)];
+    CGFloat contentHeight = self.webView.scrollView.contentSize.height;
+    NSMutableArray *images = [NSMutableArray array];
+    while (contentHeight > 0) {
+        UIGraphicsBeginImageContext(boundsSize);
+        [self.webView.layer renderInContext:UIGraphicsGetCurrentContext()];
+        UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
+        UIGraphicsEndImageContext();
+        [images addObject:image];
+        CGFloat offsetY = self.webView.scrollView.contentOffset.y;
+        [self.webView.scrollView setContentOffset:CGPointMake(0, offsetY + boundsHeight)];
+        contentHeight -= boundsHeight;
+    }
+    [self.webView.scrollView setContentOffset:offset];
+    UIGraphicsBeginImageContext(self.webView.scrollView.contentSize);
+    [images enumerateObjectsUsingBlock:^(UIImage *image, NSUInteger idx, BOOL *stop) {
+        [image drawInRect:CGRectMake(0, boundsHeight * idx, boundsWidth, boundsHeight)];
+    }];
+    UIImage *fullImage = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    
+    UIImageWriteToSavedPhotosAlbum(fullImage, self,@selector(imageSavedToPhotosAlbum:didFinishSavingWithError:contextInfo:),nil);
+    
+    return fullImage;
+}
+
+- (void)imageSavedToPhotosAlbum:(UIImage*)image didFinishSavingWithError:  (NSError*)error contextInfo:(id)contextInfo
+{
+    [[[UIAlertView alloc] initWithTitle:@"提示" message:@"保存成功" delegate:nil cancelButtonTitle:@"确认" otherButtonTitles:nil] show];
 }
 
 - (void)dismiss

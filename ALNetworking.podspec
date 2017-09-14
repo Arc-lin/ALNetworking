@@ -16,7 +16,7 @@ Pod::Spec.new do |s|
   #
 
   s.name         = "ALNetworking"
-  s.version      = "1.1.0"
+  s.version      = "1.1.1"
   s.summary      = "A networking framework , encapsulation of AFNetworking3.0,ReactiveCocoa2.5,YYCache,YYModel"
 
   # This description is used to generate tags and improve search results.

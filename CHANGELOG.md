@@ -3,6 +3,11 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [1.1.1] (https://github.com/Arc-lin/ALNetworking/releases/tag/1.1.2)
+
+#### Update
+* Fix known bugs
+
 ## [1.1.0](https://github.com/Arc-lin/ALNetworking/releases/tag/1.0.5) (06/16/2017)
 
 #### Update

@@ -17,6 +17,8 @@
 #import "ALNetworkingRequest.h"
 #import "ALNetworkingResponse.h"
 
+#define ALNetworkingInstance [ALNetworking sharedInstance]
+
 @class ALNetworkingRequest;
 
 @interface ALNetworking : NSObject

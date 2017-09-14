@@ -214,7 +214,7 @@ static ALNetworking *_networking;
                 ALNetworkingViewController *vc = [[ALNetworkingViewController alloc] initWithWebViewControllerWithHtmlStr:htmlStr];
                 // 弹出窗口
                 // pop the window
-                [[UIApplication sharedApplication].keyWindow.rootViewController presentViewController:vc animated:YES completion:nil];
+                [[self topViewController] presentViewController:vc animated:YES completion:nil];
             }
         }
         
@@ -321,6 +321,27 @@ static ALNetworking *_networking;
     [mgr startMonitoring];
 }
 
+#pragma mark - Get Top ViewControllers
+- (UIViewController *)topViewController {
+    UIViewController *resultVC;
+    resultVC = [self _topViewController:[[UIApplication sharedApplication].keyWindow rootViewController]];
+    while (resultVC.presentedViewController) {
+        resultVC = [self _topViewController:resultVC.presentedViewController];
+    }
+    return resultVC;
+}
+
+- (UIViewController *)_topViewController:(UIViewController *)vc {
+    if ([vc isKindOfClass:[UINavigationController class]]) {
+        return [self _topViewController:[(UINavigationController *)vc topViewController]];
+    } else if ([vc isKindOfClass:[UITabBarController class]]) {
+        return [self _topViewController:[(UITabBarController *)vc selectedViewController]];
+    } else {
+        return vc;
+    }
+    return nil;
+}
+
 #pragma mark - Clear the histories
 
 - (void)clearHistories
@@ -342,6 +363,8 @@ static ALNetworking *_networking;
 {
     if (!_request) {
         _request = [[ALNetworkingRequest alloc] init];
+        _request.header = self.config.defaultHeader;
+        _request.params = self.config.defaultParams;
     }
     return _request;
 }

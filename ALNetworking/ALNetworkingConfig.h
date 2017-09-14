@@ -54,6 +54,10 @@ typedef NSError *(^ALHandleLinkError)(NSError *error);
 /** The getsure to pop the history record */
 @property (nonatomic, strong) UIGestureRecognizer *gesture;
 
+/** 不弹出历史记录的控制器名 */
+/** Don't pop history controllers */
+@property (nonatomic, strong) NSArray<NSString *> *noHistoryControllerNames;
+
 /** 调试模式,默认NO 
  *  1. 记录请求
  *  2. 如果服务器端发生异常,返回异常的HTML代码,则弹出webView进行显示
