@@ -30,7 +30,7 @@ static NSString *kALNetworking_NetworkStatus = @"kALNetworking_NetworkStatus";
 
 typedef NS_ENUM(NSInteger, ALCacheStrategy) {
     ALCacheStrategyNetworkOnly, // 只网络
-    ALCacheStrategyCacheOnly, // 只取缓存
+    ALCacheStrategyCacheOnly, // 只取缓存，无缓存的时候会请求网络（比如第一次请求时）
     ALCacheStrategyCacheThenNetwork, // 先缓存后网络，回调执行两次
     ALCacheStrategyAutomatic, // 自动判断网络状况，有则网络，无则缓存
     ALCacheStrategyCacheAndNetwork, // 先缓存后网络，回调执行一次，网络请求后不回调。因为第一次请求时无缓存，所以使用会回调的网络数据
@@ -91,4 +91,4 @@ typedef NS_ENUM(NSInteger, ALNetworkingCommonParamsMethod) {
     ALNetworkingCommonParamsMethodQS,
 };
 
-#endif /* MMCNetworkingConst_h */
+#endif /* ALNetworkingConst_h */

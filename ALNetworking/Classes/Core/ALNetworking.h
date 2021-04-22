@@ -1,6 +1,6 @@
 //
-//  MMCNetworking.h
-//  BaZiPaiPanSDK
+//  ALNetworking.h
+//  ALNetworking
 //
 //  Created by Arclin on 2018/4/21.
 //
@@ -13,60 +13,6 @@
 #import <AFNetworking/AFNetworking.h>
 
 @interface ALNetworking : NSObject
-
-- (ALNetworking * (^)(ALNetworkRequestMethod metohd))method;
-
-- (ALNetworking * (^)(ALNetworkResponseType type))responseType;
-
-- (ALNetworking * (^)(NSString *url))url;
-
-- (ALNetworking * (^)(NSDictionary *header))header;
-
-- (ALNetworking * (^)(ALCacheStrategy strategy))cacheStrategy;
-
-- (ALNetworking * (^)(NSDictionary *params))params;
-
-/// 最短的重复请求时间间隔
-- (ALNetworking * (^)(float timeInterval))minRepeatInterval;
-
-/// 最短的重复请求时间 带上条件，如果true的时候，则忽略该时间间隔
-- (ALNetworking * (^)(float timeInterval,BOOL forceRequest))minRepeatIntervalInCondition;
-
-/// 添加假数据，当on为true的时候启用，不发送网络请求 上传接口无效
-- (ALNetworking * (^)(id data,BOOL on))mockData;
-
-- (ALNetworking * (^)(ALNetworkRequestParamsType paramsType))paramsType;
-
-- (ALNetworking * (^)(NSData *data,NSString *fileName,NSString *mimeType))uploadData;
-
-- (ALNetworking * (^)(NSString *))fileFieldName;
-
-/** 上传文件时，请在适当的地方调用这个方法，清理掉一些旧数据 **/
-- (ALNetworking *)prepareForUpload;
-
-/** 文件上传/下载进度 */
-- (ALNetworking * (^)(void(^handleProgress)(float progress)))progress;
-
-/**
- 请求的唯一标识符
- */
-- (ALNetworking * (^)(NSString *name))name;
-
-/**
- 本次请求不启用动态参数，同时忽略的还有Config中的dynamicHandleRequest配置
- */
-- (ALNetworking *)disableDynamicParams;
-
-/**
- 本次请求不启用动态请求头，同时忽略的还有Config中的dynamicHandleRequest配置
- */
-- (ALNetworking *)disableDynamicHeader;
-
-/// 是否需要在请求前清除缓存
-- (ALNetworking *(^)(BOOL remove))removeCache;
-
-/// 下载目的路径
-- (ALNetworking *(^)(NSString *destPath))downloadDestPath;
 
 #ifdef RAC
 - (RACSignal<RACTuple *> *)executeSignal;
@@ -105,10 +51,10 @@
 @property (nonatomic, copy) NSString *prefixUrl;
 
 /** 通用请求头 */
-@property (nonatomic, copy) NSDictionary *commonHeader;
+@property (nonatomic, copy) NSDictionary *defaultHeader;
 
 /** 通用参数 */
-@property (nonatomic, copy) NSDictionary *commonParams;
+@property (nonatomic, copy) NSDictionary *defaultParams;
 
 /** 忽略Config中配置的默认请求头 */
 @property (nonatomic, assign) BOOL ignoreDefaultHeader;

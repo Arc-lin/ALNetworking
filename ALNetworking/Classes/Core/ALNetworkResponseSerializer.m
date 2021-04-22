@@ -1,6 +1,6 @@
 //
 //  ALNetworkResponseSerializer.m
-//  MMCNetworking
+//  ALNetworking
 //
 //  Created by Arclin on 2020/11/27.
 //

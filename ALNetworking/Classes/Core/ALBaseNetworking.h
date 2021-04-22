@@ -1,6 +1,6 @@
 //
 //  MMCBaseNeetworking.h
-//  BaZiPaiPanSDK
+//  ALNetworking
 //
 //  Created by Arclin on 2018/4/21.
 //

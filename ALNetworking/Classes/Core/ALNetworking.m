@@ -1,6 +1,6 @@
 //
-//  MMCNetworking.m
-//  BaZiPaiPanSDK
+//  ALNetworking.m
+//  ALNetworking
 //
 //  Created by Arclin on 2018/4/21.
 //
@@ -33,192 +33,6 @@
 @end
 
 @implementation ALNetworking
-
-- (ALNetworking *(^)(ALNetworkRequestMethod))method {
-    return ^ALNetworking *(ALNetworkRequestMethod method) {
-        self.request.method = method;
-        return self;
-    };
-}
-
-- (ALNetworking *(^)(ALNetworkResponseType))responseType {
-    return ^ALNetworking *(ALNetworkResponseType type) {
-        self.request.responseType = type;
-        return self;
-    };
-}
-
-- (ALNetworking *(^)(NSString *))url {
-    return ^ALNetworking *(NSString *url) {
-        NSString *urlStr;
-        
-        NSString *utf8Url = [url stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]];
-
-        if ([url hasPrefix:@"http://"] || [url hasPrefix:@"https://"]) {
-            self.request.urlStr = utf8Url;
-            return self;
-        }
-                
-        NSString *defaultPrefixUrl = [ALNetworkingConfig defaultConfig].defaultPrefixUrl;
-        
-        // 优先自己的前缀
-        NSString *prefix = self.prefixUrl ?: defaultPrefixUrl;
-        if (!prefix || prefix.length == 0) {
-            self.request.urlStr = utf8Url;
-            return self;
-        }
-        
-        // 处理重复斜杠的问题
-        NSString *removeSlash;
-        if(prefix.length > 0 && utf8Url.length > 0) {
-            NSString *lastCharInPrefix = [prefix substringFromIndex:prefix.length - 1];
-            NSString *firstCharInUrl = [utf8Url substringToIndex:1];
-            if ([lastCharInPrefix isEqualToString:@"/"] &&
-                [firstCharInUrl isEqualToString:@"/"]) {
-                removeSlash = [prefix substringToIndex:prefix.length - 1];
-            }
-        }
-        if (removeSlash) {
-            prefix = removeSlash;
-        }
-        
-        urlStr = [NSString stringWithFormat:@"%@%@",prefix,utf8Url];
-        
-        self.request.urlStr = urlStr;
-        
-        return self;
-    };
-}
-
-- (ALNetworking *(^)(NSData *,  NSString *, NSString *))uploadData
-{
-    return ^ALNetworking *(NSData *data,NSString *fileName,NSString *mimeType) {
-        NSAssert(data, @"data不能为空");
-        NSAssert(fileName && fileName.length > 0, @"fileName不能为空");
-        NSAssert(mimeType && mimeType.length > 0, @"mimeType不能为空");
-        [self.request.data addObject:data];
-        [self.request.fileName addObject:fileName];
-        [self.request.mimeType addObject:mimeType];
-        return self;
-    };
-}
-
-- (ALNetworking *(^)(NSString *))fileFieldName
-{
-    return ^ALNetworking *(NSString *fileField) {
-        self.request.fileFieldName = fileField;
-        return self;
-    };
-}
-
-- (ALNetworking *)prepareForUpload
-{
-    [self.request.data removeAllObjects];
-    [self.request.fileName removeAllObjects];
-    [self.request.mimeType removeAllObjects];
-    return self;
-}
-
-- (ALNetworking * (^)(NSDictionary *header))header {
-    return ^ALNetworking *(NSDictionary *header) {
-        self.inputHeaders = header;
-        [self.request.header setValuesForKeysWithDictionary:header];
-        return self;
-    };
-}
-
-- (ALNetworking * (^)(ALCacheStrategy strategy))cacheStrategy {
-    return ^ALNetworking *(ALCacheStrategy strategy) {
-        self.request.cacheStrategy = strategy;
-        return self;
-    };
-}
-
-- (ALNetworking * (^)(NSDictionary *params))params {
-    return ^ALNetworking *(NSDictionary *params) {
-        self.inputParams = params;
-        NSMutableDictionary *reqParams = [NSMutableDictionary dictionaryWithDictionary:params];
-        [self.request.params setValuesForKeysWithDictionary:reqParams];
-        return self;
-    };
-}
-
-- (ALNetworking * (^)(ALNetworkRequestParamsType paramsType))paramsType {
-    return ^ALNetworking *(ALNetworkRequestParamsType paramsType) {
-        self.request.paramsType = paramsType;
-        return self;
-    };
-}
-
-- (ALNetworking *(^)(void (^)(float)))progress
-{
-    return ^ALNetworking *(void(^progressBlock)(float progress)) {
-        self.request.progressBlock = progressBlock;
-        return self;
-    };
-}
-
-- (ALNetworking *(^)(id, BOOL))mockData
-{
-    return ^ALNetworking *(id data,BOOL on) {
-        if (on) {
-            self.request.mockData = [data copy];
-        }
-        return self;
-    };
-}
-
-- (ALNetworking *)disableDynamicParams
-{
-    self.request.disableDynamicParams = YES;
-    return self;
-}
-
-- (ALNetworking *)disableDynamicHeader
-{
-    self.request.disableDynamicHeader = YES;
-    return self;
-}
-
-- (ALNetworking *(^)(NSString *))name {
-    return ^ALNetworking *(NSString *name) {
-        self.request.name = name;
-        return self;
-    };
-}
-
-- (ALNetworking *(^)(BOOL))removeCache
-{
-    return ^ALNetworking *(BOOL removeCache) {
-        self.request.clearCache = removeCache;
-        return self;
-    };
-}
-
-- (ALNetworking *(^)(float))minRepeatInterval
-{
-    return ^ALNetworking *(float repeatInterval) {
-        self.request.repeatRequestInterval = repeatInterval;
-        return self;
-    };
-}
-
-- (ALNetworking *(^)(float, BOOL))minRepeatIntervalInCondition
-{
-    return ^ALNetworking *(float repeatInterval,BOOL forceRequest) {
-        self.request.repeatRequestInterval = repeatInterval;
-        self.request.force = forceRequest;
-        return self;
-    };
-}
-
-- (ALNetworking *(^)(NSString *))downloadDestPath
-{
-    return ^ALNetworking *(NSString *destPath) {
-        self.request.destPath = destPath;
-        return self;
-    };
-}
 
 - (void)cancelAllRequest {
     [self.requestDictionary enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull key, ALNetworkRequest * _Nonnull obj, BOOL * _Nonnull stop) {
@@ -466,7 +280,7 @@
     }
        
     if (self.defaultParamsMethod == ALNetworkingCommonParamsMethodQS) {
-        NSString *queryString = [self stringWithDictionary:self.commonParams];
+        NSString *queryString = [self stringWithDictionary:self.defaultParams];
         request.urlStr = [request.urlStr stringByAppendingString:queryString];
     }
     
@@ -509,21 +323,32 @@
 
 - (ALNetworkRequest *)request {
     if (!_request) {
-        _request = [[ALNetworkRequest alloc] init];
-        _request.cacheStrategy = [ALNetworkingConfig defaultConfig].defaultCacheStrategy;
+        
+        /// 处理公共请求头
+        NSMutableDictionary *defaultHeader = [NSMutableDictionary dictionary];
         if (!self.ignoreDefaultHeader) {
-            [_request.header setValuesForKeysWithDictionary:[ALNetworkingConfig defaultConfig].defaultHeader];
+            [defaultHeader setValuesForKeysWithDictionary:[ALNetworkingConfig defaultConfig].defaultHeader];
         }
-        if (self.commonHeader) {
-            [_request.header setValuesForKeysWithDictionary:self.commonHeader];
+        if (self.defaultHeader) {
+            [defaultHeader setValuesForKeysWithDictionary:self.defaultHeader];
         }
         
+        /// 处理公共参数
+        NSMutableDictionary *defaultParams = [NSMutableDictionary dictionary];
         if (!self.ignoreDefaultParams && self.commonParamsMethod == ALNetworkingCommonParamsMethodFollowMethod) {
-            [_request.params setValuesForKeysWithDictionary:[ALNetworkingConfig defaultConfig].defaultParams];
+            [defaultParams setValuesForKeysWithDictionary:[ALNetworkingConfig defaultConfig].defaultParams];
         }
-        if (self.commonParams) {
+        if (self.defaultParams) {
             [_request.params setValuesForKeysWithDictionary:self.commonParams];
         }
+        
+        /// 处理baseURL
+        NSString *baseUrl = self.prefixUrl ?: [ALNetworkingConfig defaultConfig].defaultPrefixUrl;
+        
+        _request = [[ALNetworkRequest alloc] initWithBaseUrl:baseUrl
+                                               defaultHeader:defaultHeader
+                                               defaultParams:defaultParams
+                                               cacheStrategy:[ALNetworkingConfig defaultConfig].defaultCacheStrategy];
     }
     return _request;
 }
@@ -603,10 +428,6 @@
         if (!request) {
             return;
         }
-    }
-    
-    if (request.clearCache) {
-        [[ALNetworkCache defaultManager] removeCacheWithUrl:request.urlStr params:request.params];
     }
     
     request.task = [ALBaseNetworking uploadWithRequest:request progress:^(float progress) {

@@ -1,6 +1,6 @@
 //
-//  MMCNetworkingConfig.h
-//  MMCNetworkingDemo
+//  ALNetworkingConfig.h
+//  ALNetworkingDemo
 //
 //  Created by Arclin on 2018/4/28.
 //

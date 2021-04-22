@@ -64,10 +64,10 @@
     
     ALNetworking *networking = [[ALNetworking alloc] init];
 //    networking.prefixUrl = @""; // 接口前缀，会覆盖掉公有配置的接口前缀
-    networking.commonParams = @{}; // 公共参数，会添加到公有配置的公共参数里面，如果键名一样直接覆盖
+    networking.defaultParams = @{}; // 公共参数，会添加到公有配置的公共参数里面，如果键名一样直接覆盖
     networking.ignoreDefaultParams = NO; // YES的时候会忽略公有配置的公共参数
     
-    networking.commonHeader = @{}; // 公共头部，会添加到公有配置的公共头部里面，如果键名一样直接覆盖
+    networking.defaultHeader = @{}; // 公共头部，会添加到公有配置的公共头部里面，如果键名一样直接覆盖
     networking.ignoreDefaultHeader = NO; // YES的时候忽略公有配置的公共头部
     
     // 每次请求前都会走一遍，把里面的返回值作为新增参数，默认都会加，如果某个接口不想要，那么在请求链上加上disableDynamicParams

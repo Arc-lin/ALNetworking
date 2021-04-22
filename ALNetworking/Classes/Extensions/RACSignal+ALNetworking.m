@@ -154,7 +154,7 @@
             return nil;
         }
         if (![tuple isKindOfClass:[RACTuple class]]) {
-            return [RACSignal error:[NSError errorWithDomain:@"com.mmcnetworking.objmapping" code:-1 userInfo:@{NSLocalizedDescriptionKey:@"类型错误"}]];
+            return [RACSignal error:[NSError errorWithDomain:@"com.alnetworking.objmapping" code:-1 userInfo:@{NSLocalizedDescriptionKey:@"类型错误"}]];
         }
         NSArray *objs = [[tuple.rac_sequence skip:2] map:^id _Nullable(id  _Nullable value) {
             return value;

@@ -1,6 +1,6 @@
 //
-//  NSDictionary+MMCNetworking.h
-//  MMCNetworking
+//  NSDictionary+ALNetworking.h
+//  ALNetworking
 //
 //  Created by Arc Lin on 2021/1/31.
 //
