@@ -36,7 +36,7 @@
 
 - (void)cancelAllRequest {
     [self.requestDictionary enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull key, ALNetworkRequest * _Nonnull obj, BOOL * _Nonnull stop) {
-        [obj.task cancel];
+        [obj.req_requestTask cancel];
     }];
 }
 
@@ -44,10 +44,11 @@
     // 移除请求
     if ([self.requestDictionary.allKeys containsObject:name]) {
         ALNetworkRequest *request = [self.requestDictionary objectForKey:name];
-        if (request.task) {
-            [request.task cancel];
-        } else if (request.downloadTask) {
-            [request.downloadTask cancel];
+        if (request.req_requestTask) {
+            [request.req_requestTask cancel];
+        }
+        if (request.req_downloadTask) {
+            [request.req_downloadTask cancel];
         }
         [self.requestDictionary removeObjectForKey:request.name];
     } else {
@@ -57,19 +58,6 @@
 
 - (ALNetworkRequest *)getRequest {
     return self.request;
-}
-
-- (void)handleRequestSerialization:(AFHTTPRequestSerializer *(^)(AFHTTPRequestSerializer *serializer))requestSerializerBlock {
-    if (requestSerializerBlock) {
-        self.request.requestSerializerBlock = requestSerializerBlock;
-    }
-}
-
-- (void)handleResponseSerialization:(AFHTTPResponseSerializer *(^)(AFHTTPResponseSerializer *))responseSerializerBlock
-{
-    if (responseSerializerBlock) {
-        self.request.responseSerializerBlock = responseSerializerBlock;
-    }
 }
 
 #ifdef RAC
@@ -92,10 +80,6 @@
         }
     }
     
-    if (request.clearCache) {
-        [[ALNetworkCache defaultManager] removeCacheWithUrl:request.urlStr params:request.params];
-    }
-    
     @weakify(self);
     
     RACSignal *signal = [RACSignal createSignal:^RACDisposable *(id<RACSubscriber> subscriber) {
@@ -106,7 +90,7 @@
         
             // 请求完成取消请求
             if (!response.isCache) {
-                [self cancelRequestWithName:req.name];
+                [self cancelRequestWithName:req.req_name];
             }
             
             if (self.handleResponse) {
@@ -114,7 +98,7 @@
                 if (!error) {
                     [subscriber sendNext:RACTuplePack(response,req)];
                 }
-                if (req.cacheStrategy == ALCacheStrategyCacheThenNetwork) {
+                if (req.req_cacheStrategy == ALCacheStrategyCacheThenNetwork) {
                     if (!response.isCache) { // 如果是缓存模式，则不发送sendError和sendComplete
                         if (error) {
                             [subscriber sendError:error];
@@ -131,7 +115,7 @@
                 }
             } else {
                 [subscriber sendNext:RACTuplePack(response,req)];
-                if (req.cacheStrategy == ALCacheStrategyCacheThenNetwork) {
+                if (req.req_cacheStrategy == ALCacheStrategyCacheThenNetwork) {
                     if (!response.isCache) {
                         [subscriber sendCompleted];
                     }
@@ -189,12 +173,12 @@
         @strongify(self);
         
         [ALBaseNetworking downloadWithRequest:request progress:^(float progress) {
-            if (request.progressBlock) {
-                request.progressBlock(progress);
+            if (request.req_progressBlock) {
+                request.req_progressBlock(progress);
             }
         } success:^(ALNetworkResponse *response, ALNetworkRequest *request) {
            if (!response.isCache) {
-                [self cancelRequestWithName:request.name];
+                [self cancelRequestWithName:request.req_name];
             }
                 
             if (self.handleResponse) {
@@ -229,15 +213,15 @@
 
 - (BOOL)handleConfigWithRequest:(ALNetworkRequest *)request {
     
-    if (request.repeatRequestInterval > 0) { // 需要最短时间间隔
+    if (request.req_repeatRequestInterval > 0) { // 需要最短时间间隔
         NSTimeInterval currentTimeInterval = [[NSDate date] timeIntervalSince1970];
-        NSString *keyName = [[ALNetworkCache defaultManager] keyForUrl:request.urlStr params:request.params];
+        NSString *keyName = [[ALNetworkCache defaultManager] keyForUrl:request.req_urlStr params:request.req_params];
 
         if (!request.isForce) { // 不是强制请求，判断是否大于最短时间间隔
             NSTimeInterval startTime = 0;
             if ([self.requestTimeDictionary.allKeys containsObject:keyName]) {
                 startTime = [self.requestTimeDictionary[keyName] doubleValue];
-                if (currentTimeInterval - startTime < request.repeatRequestInterval) {
+                if (currentTimeInterval - startTime < request.req_repeatRequestInterval) {
                     return NO;
                 }
             }
@@ -245,26 +229,45 @@
         [self.requestTimeDictionary setObject:@(currentTimeInterval) forKey:keyName];
     }
     
-    if (!request.name || request.name.length == 0) {
-        request.name = [NSUUID UUID].UUIDString;
-    }
-    
     ALNetworkRequest *requestCopy = [request copy];
     
     // 先处理config的再处理self的
     ALNetworkingConfig *config = [ALNetworkingConfig defaultConfig];
     
-    if (!request.disableDynamicParams && (self.dynamicParamsConfig || config.dynamicParamsConfig)) { // 动态参数 , 为了保持手动传入参数的优先级最高，这里剔除掉重复的动态参数的键值对，下面的Header同理
+    if (self.commonParamsMethod == ALNetworkingCommonParamsMethodQS) {
+        request.req_urlStr = [self stringWithURLString:request.req_urlStr params:[ALNetworkingConfig defaultConfig].defaultParams];
+    }
+       
+    if (self.defaultParamsMethod == ALNetworkingCommonParamsMethodQS) {
+        request.req_urlStr = [self stringWithURLString:request.req_urlStr params:self.defaultParams];
+    }
+    
+    request.req_startTimeInterval = [[NSDate date] timeIntervalSince1970];
+    
+    [self.requestDictionary setObject:request forKey:request.name];
+    
+    if (request.req_disableDynamicParams == ALNetworkingConfigTypeAll) {
+        return YES;
+    }
+    
+    if (request.req_disableDynamicParams == 0) {
+        NSDictionary *configParams = config.dynamicParamsConfig(request);
+        NSDictionary *innerParams = self.dynamicParamsConfig(request);
+        NSMutableDictionary *dic = [NSMutableDictionary dictionary];
+        [dic addEntriesFromDictionary:configParams];
+        [dic addEntriesFromDictionary:innerParams];
+        
+    } (self.dynamicParamsConfig || config.dynamicParamsConfig)) { // 动态参数 , 为了保持手动传入参数的优先级最高，这里剔除掉重复的动态参数的键值对，下面的Header同理
         NSDictionary *(^dynamicParamsConfig)(ALNetworkRequest *request) = self.dynamicParamsConfig ?: config.dynamicParamsConfig;
         NSDictionary *dynamicParams = dynamicParamsConfig(requestCopy);
         [dynamicParams enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull key, id  _Nonnull obj, BOOL * _Nonnull stop) {
             if (![self.inputParams.allKeys containsObject:key]) {
-                [request.params setObject:obj forKey:key];
+                [request.req_params setObject:obj forKey:key];
             }
         }];
     }
     
-    if (!request.disableDynamicHeader && (self.dynamicHeaderConfig || config.dynamicHeaderConfig)) {
+    if (!request.req_disableDynamicHeader && (self.dynamicHeaderConfig || config.dynamicHeaderConfig)) {
         NSDictionary *(^dynamicHeaderConfig)(ALNetworkRequest *request) = self.dynamicHeaderConfig ?: config.dynamicHeaderConfig;
         NSDictionary *dynamicHeader = dynamicHeaderConfig(requestCopy);
         [dynamicHeader enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull key, id  _Nonnull obj, BOOL * _Nonnull stop) {
@@ -273,39 +276,26 @@
             }
         }];
     }
-    
-    if (self.commonParamsMethod == ALNetworkingCommonParamsMethodQS) {
-        NSString *queryString = [self stringWithDictionary:[ALNetworkingConfig defaultConfig].defaultParams];
-        request.urlStr = [request.urlStr stringByAppendingString:queryString];
-    }
-       
-    if (self.defaultParamsMethod == ALNetworkingCommonParamsMethodQS) {
-        NSString *queryString = [self stringWithDictionary:self.defaultParams];
-        request.urlStr = [request.urlStr stringByAppendingString:queryString];
-    }
-    
-    request.startTimeInterval = [[NSDate date] timeIntervalSince1970];
-    
-    [self.requestDictionary setObject:request forKey:request.name];
-    
+  
     return YES;
 }
 
-- (NSString *)stringWithDictionary:(NSDictionary *)dic {
-    NSMutableString *ms = [NSMutableString stringWithString:@"?"];
+- (NSString *)stringWithURLString:(NSString *)urlString params:(NSDictionary *)dic {
+    NSURLComponents *components= [NSURLComponents componentsWithString:urlString];
+    NSMutableArray<NSURLQueryItem *> *queryItems = @[].mutableCopy;
     [dic enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull key, id  _Nonnull obj, BOOL * _Nonnull stop) {
-        [ms appendFormat:@"%@=%@&",key,obj];
+        [queryItems addObject:[NSURLQueryItem queryItemWithName:key value:obj]];
     }];
-    NSString *s = [ms substringToIndex:ms.length - 1];
-    return s;
+    components.queryItems = queryItems;
+    return components.URL.absoluteString;
 }
 
 - (BOOL)handleError:(ALNetworkRequest *)request response:(ALNetworkResponse *)response isCache:(BOOL)isCache error:(NSError *)error
 {
     if (!isCache) {
-        [self cancelRequestWithName:request.name];
+        [self cancelRequestWithName:request.req_name];
     }
-    if (error.code == kNoCacheErrorCode && request.cacheStrategy != ALCacheStrategyCacheOnly) { // 无缓存不回调
+    if (error.code == kNoCacheErrorCode && request.req_cacheStrategy != ALCacheStrategyCacheOnly) { // 无缓存不回调
         return NO;
     }
     if (error.code == NSURLErrorCancelled) {
@@ -339,7 +329,7 @@
             [defaultParams setValuesForKeysWithDictionary:[ALNetworkingConfig defaultConfig].defaultParams];
         }
         if (self.defaultParams) {
-            [_request.params setValuesForKeysWithDictionary:self.commonParams];
+            [_request.req_params setValuesForKeysWithDictionary:self.commonParams];
         }
         
         /// 处理baseURL
@@ -348,7 +338,7 @@
         _request = [[ALNetworkRequest alloc] initWithBaseUrl:baseUrl
                                                defaultHeader:defaultHeader
                                                defaultParams:defaultParams
-                                               cacheStrategy:[ALNetworkingConfig defaultConfig].defaultCacheStrategy];
+                                               defaultCacheStrategy:[ALNetworkingConfig defaultConfig].defaultCacheStrategy];
     }
     return _request;
 }
@@ -378,7 +368,7 @@
     request.task = [ALBaseNetworking requestWithRequest:request mockData:request.mockData success:^(ALNetworkResponse *response, ALNetworkRequest *req) {
         
         if (!response.isCache) {
-            [self cancelRequestWithName:req.name];
+            [self cancelRequestWithName:req.req_name];
         }
         
         if (self.handleResponse) {

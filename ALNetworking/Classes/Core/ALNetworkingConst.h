@@ -91,4 +91,14 @@ typedef NS_ENUM(NSInteger, ALNetworkingCommonParamsMethod) {
     ALNetworkingCommonParamsMethodQS,
 };
 
+/// 请求配置的位置
+typedef NS_ENUM(NSInteger, ALNetworkingConfigType) {
+    /// 全局配置和私有配置
+    ALNetworkingConfigTypeAll = 1,
+    /// 全局配置
+    ALNetworkingConfigTypePublic,
+    /// 私有配置
+    ALNetworkingConfigTypePrivate,
+};
+
 #endif /* ALNetworkingConst_h */

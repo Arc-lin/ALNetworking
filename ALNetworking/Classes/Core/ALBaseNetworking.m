@@ -27,7 +27,7 @@
         return nil;
     }
     
-    switch (req.cacheStrategy) {
+    switch (req.req_cacheStrategy) {
         case ALCacheStrategyNetworkOnly:
             dataTask = [self networkWithRequest:req success:success failure:failure];
             break;
@@ -75,7 +75,7 @@
             break;
     }
     
-    req.task = dataTask;
+    req.req_requestTask = dataTask;
     
     return dataTask;
 }
@@ -114,7 +114,7 @@
     NSArray *methods = @[@"GET",@"POST",@"PUT",@"PATCH",@"DELETE"];
     
     NSError *serializationError = nil;
-    NSMutableURLRequest *request = [mgr.requestSerializer requestWithMethod:methods[req.method] URLString:req.urlStr parameters:req.params error:&serializationError];
+    NSMutableURLRequest *request = [mgr.requestSerializer requestWithMethod:methods[req.method] URLString:req.req_urlStr parameters:req.params error:&serializationError];
     
     if (serializationError) {
         if (failure) {
@@ -123,22 +123,21 @@
     }
 
     __block NSURLSessionDataTask *dataTask = nil;
-//    NSLog(@"%@\n%@",request.URL.absoluteString,request.allHTTPHeaderFields);
+
     dataTask = [mgr dataTaskWithRequest:request
                              uploadProgress:nil
                            downloadProgress:nil
                           completionHandler:^(NSURLResponse * __unused response, id responseObject, NSError *error) {
-//                              NSLog(@"%@",responseObject);
+
         if (!error) {
             if ([response isKindOfClass:NSHTTPURLResponse.class]) {
-                error = [ALNetworkResponseSerializer verifyWithResponseType:req.responseType reponse:(NSHTTPURLResponse *)response reponseObject:responseObject];
+                error = [ALNetworkResponseSerializer verifyWithResponseType:req.req_responseType reponse:(NSHTTPURLResponse *)response reponseObject:responseObject];
             }
         }
         if (error) {
             if (failure) {
                 failure(req,NO,responseObject,error);
                 NSLog(@"%@",[[NSString alloc] initWithData:error.userInfo[AFNetworkingOperationFailingURLResponseDataErrorKey] encoding:4]);
-//                                      LMLog(@"%@\n%@\n%@\n",req.urlStr,req.header.mj_JSONString,req.params.mj_JSONString);
             }
         } else {
             if (success) {
@@ -161,11 +160,11 @@
     
     [self configWithRequest:req manager:mgr setTimeOut:NO];
     
-    NSURLSessionDataTask *task = [mgr POST:req.urlStr parameters:req.params headers:nil constructingBodyWithBlock:^(id<AFMultipartFormData>  _Nonnull formData) {
-        if (req.data && req.data.count > 0) {
+    NSURLSessionDataTask *task = [mgr POST:req.req_urlStr parameters:req.req_params headers:nil constructingBodyWithBlock:^(id<AFMultipartFormData>  _Nonnull formData) {
+        if (req.req_data && req.req_data.count > 0) {
             NSInteger index = 0;
-            for (NSData *data in req.data) {
-                [formData appendPartWithFileData:data name:req.fileFieldName fileName:req.fileName[index] mimeType:req.mimeType[index]];
+            for (NSData *data in req.req_data) {
+                [formData appendPartWithFileData:data name:req.req_fileFieldName fileName:req.req_fileName[index] mimeType:req.req_mimeType[index]];
                 index++;
             }
         }
@@ -190,7 +189,7 @@
         }
     }];
     
-    req.task = task;
+    req.req_task = task;
 
     return task;
 }
@@ -227,7 +226,7 @@
         }
     }];
     
-    req.downloadTask = task;
+    req.req_downloadTask = task;
     
     [task resume];
     
@@ -237,7 +236,7 @@
 + (void)configWithRequest:(ALNetworkRequest *)req manager:(ALAPIClient *)mgr setTimeOut:(BOOL)setTimeOut
 {
     // Setting sequrity policy
-    if (req.sslCerPath) {
+    if (req.req_sslCerPath) {
         AFSecurityPolicy *securityPolicy        = [AFSecurityPolicy policyWithPinningMode:AFSSLPinningModeCertificate];
         securityPolicy.pinnedCertificates       = [NSSet setWithObject:[NSData dataWithContentsOfFile:req.sslCerPath]];
         securityPolicy.allowInvalidCertificates = NO;
@@ -250,14 +249,14 @@
     AFHTTPRequestSerializer *requestSerializer;
     
     // Request by json type
-    if(req.paramsType == ALNetworkRequestParamsTypeJSON) {
+    if(req.req_paramsType == ALNetworkRequestParamsTypeJSON) {
         requestSerializer = [AFJSONRequestSerializer serializer];
     } else {
         requestSerializer = [AFHTTPRequestSerializer serializer];
     }
     
     // Set request header
-    if (req.header && req.header.allKeys.count > 0) {
+    if (req.req_header && req.header.allKeys.count > 0) {
         [req.header enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull key, id obj, BOOL * _Nonnull stop) {
             [requestSerializer setValue:obj forHTTPHeaderField:key];
         }];
@@ -273,12 +272,8 @@
         requestSerializer.timeoutInterval = 60.0f;
     }
     
-    if (req.requestSerializerBlock) {
-        mgr.requestSerializer = req.requestSerializerBlock(requestSerializer);
-    } else {
-        mgr.requestSerializer = requestSerializer;
-    }
-    
+    mgr.requestSerializer = requestSerializer;
+
     // 直接支持多种格式的返回
     mgr.responseSerializer = [AFCompoundResponseSerializer compoundSerializerWithResponseSerializers:@[
         [AFJSONResponseSerializer serializer],

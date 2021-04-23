@@ -12,9 +12,6 @@
 /** 请求地址前缀 */
 @property (nonatomic, copy)   NSString                    *baseUrl;
 
-/** 请求地址 */
-@property (nonatomic, copy)   NSString                    *req_urlStr;
-
 /** 请求参数 */
 @property (nonatomic, strong) NSMutableDictionary         *req_params;
 @property (nonatomic, strong) NSDictionary                *req_inputParams;
@@ -24,7 +21,7 @@
 @property (nonatomic, strong) NSDictionary                *req_inputHeader;
 
 /** 请求Task 当启用假数据返回的时候为空 */
-@property (nonatomic, strong) NSURLSessionDataTask        *task;
+@property (nonatomic, strong) NSURLSessionDataTask        *req_requestTask;
 
 /** 下载Task */
 @property (nonatomic, strong) NSURLSessionDownloadTask    *req_downloadTask;
@@ -42,13 +39,25 @@
 @property (nonatomic, assign) ALNetworkResponseType        req_responseType;
 
 /** 禁止了动态参数 */
-@property (nonatomic, assign) BOOL                         req_disableDynamicParams;
+@property (nonatomic, assign) ALNetworkingConfigType       req_disableDynamicParams;
 
 /** 禁止了动态请求头 */
-@property (nonatomic, assign) BOOL                         req_disableDynamicHeader;
+@property (nonatomic, assign) ALNetworkingConfigType       req_disableDynamicHeader;
 
 /** 唯一标识符 */
 @property (nonatomic, copy) NSString                       *req_name;
+
+/** 忽略最短请求间隔 强制发出请求 */
+@property (nonatomic, assign, getter=isForce) BOOL         req_force;
+
+/** 最短重复请求时间 */
+@property (nonatomic, assign) float                        req_repeatRequestInterval;
+
+/** 自定义属性 */
+@property (nonatomic, strong) NSMutableDictionary<NSString *,id<NSCopying>> *req_customProperty;
+
+/** 假数据 */
+@property (nonatomic, strong) id<NSCopying>               req_mockData;
 
 /** SSL证书 */
 @property (nonatomic, copy) NSString                       *req_sslCerPath;
@@ -65,24 +74,8 @@
 /** 文件类型 */
 @property (nonatomic, strong) NSMutableArray<NSString *>   *req_mimeType;
 
-
-/** 忽略最短请求间隔 强制发出请求 */
-@property (nonatomic, assign, getter=isForce) BOOL         req_force;
-
-/** 最短重复请求时间 */
-@property (nonatomic, assign) float                        req_repeatRequestInterval;
-
-/** 自定义属性 */
-@property (nonatomic, strong) NSMutableDictionary<NSString *,id<NSCopying>> *req_customProperty;
-
-/** 假数据 */
-@property (nonatomic, strong) id<NSCopying>               req_mockData;
-
 /** 下载路径 */
 @property (nonatomic, copy) NSString                      *req_destPath;
-
-/** 起始时间 */
-@property (nonatomic, assign) NSTimeInterval              req_startTimeInterval;
 
 /** 上传/下载进度 */
 @property (nonatomic, copy) void(^req_progressBlock)(float progress);
@@ -91,7 +84,7 @@
 
 @implementation ALNetworkRequest
 
-- (instancetype)initWithBaseUrl:(NSString *)baseUrl defaultHeader:(NSDictionary *)defaultHeader defaultParams:(NSDictionary *)defaultParams cacheStrategy:(ALCacheStrategy)strategy {
+- (instancetype)initWithBaseUrl:(NSString *)baseUrl defaultHeader:(NSDictionary *)defaultHeader defaultParams:(NSDictionary *)defaultParams defaultCacheStrategy:(ALCacheStrategy)strategy {
     if (self = [super init]) {
         self.baseUrl = [baseUrl copy];
         if (defaultHeader) {
@@ -105,6 +98,10 @@
             self.req_params = [NSMutableDictionary dictionary];
         }
         self.req_cacheStrategy = strategy;
+        /// 给一个默认的唯一标识符
+        self.req_name = [NSUUID UUID].UUIDString;
+        self.req_disableDynamicParams = 0;
+        self.req_disableDynamicHeader = 0;
     }
     return self;
 }
@@ -264,16 +261,20 @@
     };
 }
 
-- (ALNetworkRequest *)disableDynamicParams
+- (ALNetworkRequest *(^)(ALNetworkingConfigType configType))disableDynamicParams
 {
-    self.req_disableDynamicParams = YES;
-    return self;
+    return ^ALNetworkRequest *(ALNetworkingConfigType configType) {
+        self.req_disableDynamicParams = configType;
+        return self;
+    };
 }
 
-- (ALNetworkRequest *)disableDynamicHeader
+- (ALNetworkRequest *(^)(ALNetworkingConfigType configType))disableDynamicHeader
 {
-    self.req_disableDynamicHeader = YES;
-    return self;
+    return ^ALNetworkRequest *(ALNetworkingConfigType configType) {
+        self.req_disableDynamicHeader = configType;
+        return self;
+    };
 }
 
 - (ALNetworkRequest *(^)(float))minRepeatInterval
@@ -300,7 +301,7 @@
     request.req_urlStr = self.req_urlStr;
     request.req_params = self.req_params;
     request.req_header = self.req_header;
-    request.task = self.task;
+    request.req_requestTask = self.req_requestTask;
     request.req_cacheStrategy = self.req_cacheStrategy;
     request.req_method = self.req_method;
     request.req_paramsType = self.req_paramsType;
