@@ -30,22 +30,12 @@
  */
 - (void)cancelRequestWithName:(NSString *)name;
 
-/**
- 处理AF请求体,普通情况下无需调用,有特殊需求时才需要拦截AF的请求体进行修改
- */
-- (void)handleRequestSerialization:(AFHTTPRequestSerializer *(^)(AFHTTPRequestSerializer *serializer))requestSerializerBlock;
-
-/**
- 处理AF响应体,普通情况下无需调用,有特殊需求时才需要拦截AF的响应体进行修改
- */
-- (void)handleResponseSerialization:(AFHTTPResponseSerializer *(^)(AFHTTPResponseSerializer *serializer))responseSerializerBlock;
-
 #pragma mark - 请求配置
 
 /**
- 请求体 : 必要情况下可以修改里面的属性
+ 请求体
  */
-@property (nonatomic, strong) ALNetworkRequest *request;
+@property (nonatomic, strong, readonly) ALNetworkRequest *request;
 
 /** 接口前缀 */
 @property (nonatomic, copy) NSString *prefixUrl;

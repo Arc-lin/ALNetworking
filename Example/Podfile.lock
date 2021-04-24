@@ -64,7 +64,7 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   AFNetworking: 7864c38297c79aaca1500c33288e429c3451fdce
-  ALNetworking: ddfac9277680b6bbd9f10e26b80280924244d065
+  ALNetworking: 6ed4b72758fc1059ae40f403ac53d44584d2b5c8
   cocore: d6abaa4dd8c15115290362b9accbb42cc2bce9a0
   coobjc: 090a460e32e90d0e820e64c31cf7b79dece51a7c
   Kiwi: fbeafef0f00e4d8f7dcb3420a4930afe70af77f7

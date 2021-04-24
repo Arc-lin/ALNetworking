@@ -24,11 +24,10 @@
 /// 请求起始时间
 @property (nonatomic, strong) NSMutableDictionary *requestTimeDictionary;
 
-/** 保存一下手动传入的参数，保证他是最高优先级 */
-@property (nonatomic, copy) NSDictionary *inputParams;
-
-/** 保存一下手动传入的Header，保证他是最高优先级 */
-@property (nonatomic, copy) NSDictionary *inputHeaders;
+/**
+ 请求体
+ */
+@property (nonatomic, strong) ALNetworkRequest *request;
 
 @end
 
@@ -86,7 +85,7 @@
         
         @strongify(self);
         
-        [ALBaseNetworking requestWithRequest:request mockData:request.mockData success:^(ALNetworkResponse *response, ALNetworkRequest *req) {
+        request.req_requestTask = [ALBaseNetworking requestWithRequest:request mockData:request.mockData success:^(ALNetworkResponse *response, ALNetworkRequest *req) {
         
             // 请求完成取消请求
             if (!response.isCache) {
@@ -172,7 +171,7 @@
         
         @strongify(self);
         
-        [ALBaseNetworking downloadWithRequest:request progress:^(float progress) {
+        request.req_downloadTask = [ALBaseNetworking downloadWithRequest:request progress:^(float progress) {
             if (request.req_progressBlock) {
                 request.req_progressBlock(progress);
             }
@@ -229,53 +228,80 @@
         [self.requestTimeDictionary setObject:@(currentTimeInterval) forKey:keyName];
     }
     
+    /// 防止改动了不必要的东西，所以复制一份
     ALNetworkRequest *requestCopy = [request copy];
     
-    // 先处理config的再处理self的
     ALNetworkingConfig *config = [ALNetworkingConfig defaultConfig];
     
+    // 先处理config的再处理self的
     if (self.commonParamsMethod == ALNetworkingCommonParamsMethodQS) {
         request.req_urlStr = [self stringWithURLString:request.req_urlStr params:[ALNetworkingConfig defaultConfig].defaultParams];
     }
-       
+    
     if (self.defaultParamsMethod == ALNetworkingCommonParamsMethodQS) {
         request.req_urlStr = [self stringWithURLString:request.req_urlStr params:self.defaultParams];
     }
     
+    /// 记录请求起始时间
     request.req_startTimeInterval = [[NSDate date] timeIntervalSince1970];
     
     [self.requestDictionary setObject:request forKey:request.name];
-    
+        
     if (request.req_disableDynamicParams == ALNetworkingConfigTypeAll) {
         return YES;
     }
     
-    if (request.req_disableDynamicParams == 0) {
-        NSDictionary *configParams = config.dynamicParamsConfig(request);
-        NSDictionary *innerParams = self.dynamicParamsConfig(request);
-        NSMutableDictionary *dic = [NSMutableDictionary dictionary];
-        [dic addEntriesFromDictionary:configParams];
-        [dic addEntriesFromDictionary:innerParams];
-        
-    } (self.dynamicParamsConfig || config.dynamicParamsConfig)) { // 动态参数 , 为了保持手动传入参数的优先级最高，这里剔除掉重复的动态参数的键值对，下面的Header同理
-        NSDictionary *(^dynamicParamsConfig)(ALNetworkRequest *request) = self.dynamicParamsConfig ?: config.dynamicParamsConfig;
-        NSDictionary *dynamicParams = dynamicParamsConfig(requestCopy);
-        [dynamicParams enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull key, id  _Nonnull obj, BOOL * _Nonnull stop) {
-            if (![self.inputParams.allKeys containsObject:key]) {
-                [request.req_params setObject:obj forKey:key];
-            }
-        }];
+    /// 处理动态参数
+    NSMutableDictionary *pramsDic = [NSMutableDictionary dictionary];
+    
+    /// 优先级最低
+    if (request.req_disableDynamicParams != ALNetworkingConfigTypePublic && config.dynamicParamsConfig) {
+        NSDictionary *configParams = config.dynamicParamsConfig(requestCopy);
+        if (configParams) {
+            [pramsDic addEntriesFromDictionary:configParams];
+        }
     }
     
-    if (!request.req_disableDynamicHeader && (self.dynamicHeaderConfig || config.dynamicHeaderConfig)) {
-        NSDictionary *(^dynamicHeaderConfig)(ALNetworkRequest *request) = self.dynamicHeaderConfig ?: config.dynamicHeaderConfig;
-        NSDictionary *dynamicHeader = dynamicHeaderConfig(requestCopy);
-        [dynamicHeader enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull key, id  _Nonnull obj, BOOL * _Nonnull stop) {
-            if (![self.inputHeaders.allKeys containsObject:key]) {
-                [request.header setObject:obj forKey:key];
-            }
-        }];
+    /// 优先级第二
+    if (request.req_disableDynamicParams != ALNetworkingConfigTypePrivate && self.dynamicParamsConfig) {
+        NSDictionary *innerParams = self.dynamicParamsConfig(requestCopy);
+        if (innerParams) {
+            [pramsDic addEntriesFromDictionary:innerParams];
+        }
     }
+    
+    /// 补充上去最终传入的参数，优先级最高
+    if (request.req_inputParams) {
+        [pramsDic addEntriesFromDictionary:request.req_inputParams];
+    }
+    
+    request.req_params = pramsDic;
+    
+    /// 处理动态头部
+    NSMutableDictionary *headerDic = [NSMutableDictionary dictionary];
+    
+    /// 优先级最低
+    if (request.req_disableDynamicHeader != ALNetworkingConfigTypePublic && config.dynamicHeaderConfig) {
+        NSDictionary *configHeader = config.dynamicHeaderConfig(request);
+        if (configHeader) {
+            [headerDic addEntriesFromDictionary:configHeader];
+        }
+    }
+    
+    /// 优先级第二
+    if (request.req_disableDynamicHeader != ALNetworkingConfigTypePrivate && self.dynamicHeaderConfig) {
+        NSDictionary *innerHeader = self.dynamicHeaderConfig(request);
+        if (innerHeader) {
+            [headerDic addEntriesFromDictionary:innerHeader];
+        }
+    }
+    
+    /// 补充上去最终传入的参数，优先级最高
+    if (request.req_inputHeader) {
+        [headerDic addEntriesFromDictionary:request.req_inputHeader];
+    }
+    
+    request.req_header = headerDic;
   
     return YES;
 }
@@ -329,7 +355,7 @@
             [defaultParams setValuesForKeysWithDictionary:[ALNetworkingConfig defaultConfig].defaultParams];
         }
         if (self.defaultParams) {
-            [_request.req_params setValuesForKeysWithDictionary:self.commonParams];
+            [_request.req_params setValuesForKeysWithDictionary:self.defaultParams];
         }
         
         /// 处理baseURL
@@ -365,7 +391,7 @@
     }
            
     // AF内部解开self的循环引用，所以不用弱引用
-    request.task = [ALBaseNetworking requestWithRequest:request mockData:request.mockData success:^(ALNetworkResponse *response, ALNetworkRequest *req) {
+    request.req_requestTask = [ALBaseNetworking requestWithRequest:request mockData:request.mockData success:^(ALNetworkResponse *response, ALNetworkRequest *req) {
         
         if (!response.isCache) {
             [self cancelRequestWithName:req.req_name];
@@ -420,14 +446,14 @@
         }
     }
     
-    request.task = [ALBaseNetworking uploadWithRequest:request progress:^(float progress) {
-        if (request.progressBlock) {
-            request.progressBlock(progress);
+    request.req_requestTask = [ALBaseNetworking uploadWithRequest:request progress:^(float progress) {
+        if (request.req_progressBlock) {
+            request.req_progressBlock(progress);
         }
     } success:^(ALNetworkResponse *response, ALNetworkRequest *request) {
         
         if (!response.isCache) {
-            [self cancelRequestWithName:request.name];
+            [self cancelRequestWithName:request.req_name];
         }
         
         if (self.handleResponse) {

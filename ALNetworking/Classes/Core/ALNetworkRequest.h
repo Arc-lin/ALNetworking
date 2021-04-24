@@ -87,18 +87,21 @@
 @property (nonatomic, copy)   NSString                    *req_urlStr;
 
 /** 请求参数 */
-@property (nonatomic, strong, readonly) NSMutableDictionary         *req_params;
-@property (nonatomic, strong, readonly) NSDictionary                *req_inputParams;
+@property (nonatomic, strong) NSMutableDictionary         *req_params;
+@property (nonatomic, strong, readonly) NSDictionary      *req_inputParams;
 
 /** 请求头 */
-@property (nonatomic, strong, readonly) NSMutableDictionary         *req_header;
-@property (nonatomic, strong, readonly) NSDictionary                *req_inputHeader;
+@property (nonatomic, strong) NSMutableDictionary         *req_header;
+@property (nonatomic, strong, readonly) NSDictionary      *req_inputHeader;
 
 /** 请求Task 当启用假数据返回的时候为空 */
-@property (nonatomic, strong, readonly) NSURLSessionDataTask        *req_requestTask;
+@property (nonatomic, strong) NSURLSessionDataTask        *req_requestTask;
 
 /** 下载Task */
-@property (nonatomic, strong, readonly) NSURLSessionDownloadTask    *req_downloadTask;
+@property (nonatomic, strong) NSURLSessionDownloadTask    *req_downloadTask;
+
+/** 请求方式 */
+@property (nonatomic, assign, readonly) ALNetworkRequestMethod       req_method;
 
 /** 缓存策略 默认ALCacheStrategyNetworkOnly */
 @property (nonatomic, assign, readonly) ALCacheStrategy              req_cacheStrategy;

@@ -38,15 +38,15 @@
 //        NSLog(@"Handle!!!!!");
         return nil;
     };
-    networking.url(@"http://myip.ipip.net").name(@"请求1").params(@{@"test":self.page}).executeRequest = ^void(ALNetworkResponse *response, ALNetworkRequest *request, NSError *error) {
+    networking.request.url(@"http://myip.ipip.net").name(@"请求1").params(@{@"test":self.page}).executeRequest = ^void(ALNetworkResponse *response, ALNetworkRequest *request, NSError *error) {
         NSLog(@"%@",response.rawData);
     };
     
-    networking.url(@"http://myip.ipip.net").name(@"请求2").params(@{@"test":self.page}).executeRequest = ^void(ALNetworkResponse *response, ALNetworkRequest *request, NSError *error) {
+    networking.request.url(@"http://myip.ipip.net").name(@"请求2").params(@{@"test":self.page}).executeRequest = ^void(ALNetworkResponse *response, ALNetworkRequest *request, NSError *error) {
         NSLog(@"%@",response.rawData);
     };
     
-    networking.url(@"http://myip.ipip.net").name(@"请求3").params(@{@"test":self.page}).executeRequest = ^void(ALNetworkResponse *response, ALNetworkRequest *request, NSError *error) {
+    networking.request.url(@"http://myip.ipip.net").name(@"请求3").params(@{@"test":self.page}).executeRequest = ^void(ALNetworkResponse *response, ALNetworkRequest *request, NSError *error) {
         NSLog(@"%@",response.rawData);
     };
     

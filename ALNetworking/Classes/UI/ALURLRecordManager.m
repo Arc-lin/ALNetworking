@@ -72,13 +72,13 @@ static ALURLRecordManager *_instance;
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         @try {
             ALURLRequestRecord *record = [[ALURLRequestRecord alloc] init];
-            record.url = [NSURL URLWithString:request.urlString];
+            record.url = [NSURL URLWithString:request.req_urlStr];
 //            record.statusCode = response.;
             record.timeStamp = [NSString stringWithFormat:@"%.3f",[[NSDate date] timeIntervalSince1970]];
-            record.startTimeStamp = [NSString stringWithFormat:@"%.3f",request.requestStartTime];
+            record.startTimeStamp = [NSString stringWithFormat:@"%.3f",request.req_startTimeInterval];
             record.requestMethod = request.methodStr;
             record.isException = isException;
-            NSDictionary *headers = request.headerDic;
+            NSDictionary *headers = request.req_header;
             NSError *error = nil;
             NSData *headersData = [NSJSONSerialization dataWithJSONObject:headers options:NSJSONWritingPrettyPrinted error:&error];
             if (!error) {

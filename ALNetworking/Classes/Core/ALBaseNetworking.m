@@ -75,8 +75,6 @@
             break;
     }
     
-    req.req_requestTask = dataTask;
-    
     return dataTask;
 }
 
@@ -84,7 +82,7 @@
 {
     return [self networkWithRequest:req success:^(ALNetworkResponse *response, ALNetworkRequest *request) {
         // 缓存
-        [[ALNetworkCache defaultManager] setObject:response.rawData forRequestUrl:req.urlStr params:req.params memoryOnly:cacheMemoryOnly];
+        [[ALNetworkCache defaultManager] setObject:response.rawData forRequestUrl:req.req_urlStr params:req.req_params memoryOnly:cacheMemoryOnly];
         if(success) {
             success(response,request);
         }
@@ -114,7 +112,7 @@
     NSArray *methods = @[@"GET",@"POST",@"PUT",@"PATCH",@"DELETE"];
     
     NSError *serializationError = nil;
-    NSMutableURLRequest *request = [mgr.requestSerializer requestWithMethod:methods[req.method] URLString:req.req_urlStr parameters:req.params error:&serializationError];
+    NSMutableURLRequest *request = [mgr.requestSerializer requestWithMethod:methods[req.req_method] URLString:req.req_urlStr parameters:req.params error:&serializationError];
     
     if (serializationError) {
         if (failure) {
@@ -188,8 +186,6 @@
 
         }
     }];
-    
-    req.req_task = task;
 
     return task;
 }
@@ -200,7 +196,7 @@
     
     [self configWithRequest:req manager:mgr setTimeOut:NO];
 
-    NSURL *downloadURL = [NSURL URLWithString:req.urlStr];
+    NSURL *downloadURL = [NSURL URLWithString:req.req_urlStr];
 
     NSURLRequest *downloadRequest = [NSURLRequest requestWithURL:downloadURL];
     
@@ -209,7 +205,7 @@
             progressBlock((float)downloadProgress.completedUnitCount / (float)downloadProgress.totalUnitCount);
         }
     } destination:^NSURL * _Nonnull(NSURL * _Nonnull targetPath, NSURLResponse * _Nonnull response) {
-        NSString *downloadPath = req.destPath;
+        NSString *downloadPath = req.req_destPath;
         NSFileManager *fileManager = [NSFileManager defaultManager];
         [fileManager createDirectoryAtPath:downloadPath withIntermediateDirectories:YES attributes:nil error:nil];
         NSString *filePath = [downloadPath stringByAppendingPathComponent:response.suggestedFilename];
@@ -226,8 +222,6 @@
         }
     }];
     
-    req.req_downloadTask = task;
-    
     [task resume];
     
     return task;
@@ -238,7 +232,7 @@
     // Setting sequrity policy
     if (req.req_sslCerPath) {
         AFSecurityPolicy *securityPolicy        = [AFSecurityPolicy policyWithPinningMode:AFSSLPinningModeCertificate];
-        securityPolicy.pinnedCertificates       = [NSSet setWithObject:[NSData dataWithContentsOfFile:req.sslCerPath]];
+        securityPolicy.pinnedCertificates       = [NSSet setWithObject:[NSData dataWithContentsOfFile:req.req_sslCerPath]];
         securityPolicy.allowInvalidCertificates = NO;
         securityPolicy.validatesDomainName      = YES;
         mgr.securityPolicy                      = securityPolicy;
@@ -256,7 +250,7 @@
     }
     
     // Set request header
-    if (req.req_header && req.header.allKeys.count > 0) {
+    if (req.req_header && req.req_header.allKeys.count > 0) {
         [req.header enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull key, id obj, BOOL * _Nonnull stop) {
             [requestSerializer setValue:obj forHTTPHeaderField:key];
         }];
@@ -286,7 +280,7 @@
 
 + (void)cacheWithRequest:(ALNetworkRequest *)req success:(void(^)(ALNetworkResponse *response,ALNetworkRequest *request))success failure:(void(^)(ALNetworkRequest *request,BOOL isCache,id responseObject, NSError *error))failure {
     ALNetworkCache *cache = [ALNetworkCache defaultManager];
-    ALNetworkResponse *response = [cache responseForRequestUrl:req.urlStr params:req.params];
+    ALNetworkResponse *response = [cache responseForRequestUrl:req.req_urlStr params:req.req_params];
     if (response) {
         success(response,req);
     } else {

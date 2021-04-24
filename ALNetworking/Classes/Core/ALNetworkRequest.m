@@ -13,18 +13,10 @@
 @property (nonatomic, copy)   NSString                    *baseUrl;
 
 /** 请求参数 */
-@property (nonatomic, strong) NSMutableDictionary         *req_params;
 @property (nonatomic, strong) NSDictionary                *req_inputParams;
 
 /** 请求头 */
-@property (nonatomic, strong) NSMutableDictionary         *req_header;
 @property (nonatomic, strong) NSDictionary                *req_inputHeader;
-
-/** 请求Task 当启用假数据返回的时候为空 */
-@property (nonatomic, strong) NSURLSessionDataTask        *req_requestTask;
-
-/** 下载Task */
-@property (nonatomic, strong) NSURLSessionDownloadTask    *req_downloadTask;
 
 /** 缓存策略 默认ALCacheStrategyNetworkOnly */
 @property (nonatomic, assign) ALCacheStrategy              req_cacheStrategy;

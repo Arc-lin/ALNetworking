@@ -120,7 +120,7 @@
 
     // 请求之前如果你还要改参数，请求体，等等请求相关的东西，就趁现在了，这是最后的机会
     networking.handleRequest = ^ALNetworkRequest *(ALNetworkRequest *request) {
-        NSLog(@"Hanle Request 请求接口：%@ 参数：%@ 请求头：%@",request.urlStr,request.params,request.header);
+        NSLog(@"Hanle Request 请求接口：%@ 参数：%@ 请求头：%@",request.req_urlStr,request.req_params,request.req_header);
         return request;
     };
     
