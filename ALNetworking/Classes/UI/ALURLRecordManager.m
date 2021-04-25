@@ -8,7 +8,8 @@
 #import "ALURLRecordManager.h"
 #import "ALURLRequestRecord.h"
 #import "ALURLRecordsViewController.h"
-#import <ALNetworking.h>
+#import <ALNetworkRequest.h>
+#import <ALNetworkResponse.h>
 
 @interface ALURLRecordManager()
 

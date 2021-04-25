@@ -9,17 +9,17 @@
 @import XCTest;
 
 #import <Kiwi.h>
-#import <ALNetworking.h>
+#import <ALNetworkRequest.h>
 #import <ALNetworkCache.h>
 
 SPEC_BEGIN(Tests)
 describe(@"ALNetworking Test", ^{
     context(@"This Test is for cache strategy", ^{
-    __block ALNetworking *networking;
+    __block ALNetworkRequest *networking;
     __block NSString *page = @"2";
     __block NSString *size = @"20";
         beforeEach(^{
-            networking = [[ALNetworking alloc] init];
+            networking = [[ALNetworkRequest alloc] init];
             networking.dynamicParamsConfig = ^NSDictionary *(ALNetworkRequest *request) {
                 return @{@"page":page,@"size":size};
             };

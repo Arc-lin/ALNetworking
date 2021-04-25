@@ -6,6 +6,8 @@
 //
 
 #import "ALNetworkRequest.h"
+#import "ALBaseNetworking.h"
+#import "ALNetworkResponse.h"
 
 @interface ALNetworkRequest()
 
@@ -216,14 +218,6 @@
 
 #pragma mark - 上传
 
-- (ALNetworkRequest *)prepareForUpload
-{
-    [self.req_data removeAllObjects];
-    [self.req_fileName removeAllObjects];
-    [self.req_mimeType removeAllObjects];
-    return self;
-}
-
 - (ALNetworkRequest *(^)(NSData *,  NSString *, NSString *))uploadData
 {
     return ^ALNetworkRequest *(NSData *data,NSString *fileName,NSString *mimeType) {
@@ -286,7 +280,243 @@
     };
 }
 
+#pragma mark - 执行请求
 
+#ifdef RAC
+
+- (RACSignal<RACTuple *> *)executeSignal {
+    
+    ALNetworkRequest *request = self;
+    
+    if (self.handleRequest) {
+        request = self.handleRequest(self);
+        if (!request) {
+            request = nil;
+            return [RACSignal empty];
+        }
+    }
+
+    @weakify(self);
+    
+    RACSignal *signal = [RACSignal createSignal:^RACDisposable *(id<RACSubscriber> subscriber) {
+        
+        @strongify(self);
+
+        /// 记录请求起始时间，以订阅的时候开始算起
+        request.req_startTimeInterval = [[NSDate date] timeIntervalSince1970];
+
+        request.req_requestTask = [ALBaseNetworking requestWithRequest:request mockData:request.req_mockData success:^(ALNetworkResponse *response, ALNetworkRequest *req) {
+            
+            if (self.handleResponse) {
+                NSError *error = self.handleResponse(response,req);
+                if (!error) {
+                    [subscriber sendNext:RACTuplePack(response,req)];
+                }
+                if (req.req_cacheStrategy == ALCacheStrategyCacheThenNetwork) {
+                    if (!response.isCache) { // 如果是缓存模式，则不发送sendError和sendComplete
+                        if (error) {
+                            [subscriber sendError:error];
+                        } else {
+                            [subscriber sendCompleted];
+                        }
+                    }
+                } else {
+                    if (!error) {
+                        [subscriber sendCompleted];
+                    } else {
+                        [subscriber sendError:error];
+                    }
+                }
+            } else {
+                [subscriber sendNext:RACTuplePack(response,req)];
+                if (req.req_cacheStrategy == ALCacheStrategyCacheThenNetwork) {
+                    if (!response.isCache) {
+                        [subscriber sendCompleted];
+                    }
+                } else {
+                    [subscriber sendCompleted];
+                }
+            }
+        } failure:^(ALNetworkRequest *request, BOOL isCache,id responseObject,NSError *error) {
+            @strongify(self);
+            ALNetworkResponse *response = [[ALNetworkResponse alloc] init];
+            if ([self handleError:request response:response isCache:isCache error:error]) {
+                // 处理一下错误
+                response.rawData = responseObject;
+                NSError *error;
+                if (self.handleError) {
+                   error = self.handleError(request, response, error);
+                }
+                [subscriber sendError:error];
+            }
+            
+        }];
+        return nil;
+    }];
+    
+    request = nil;
+    
+    return signal;
+}
+
+
+- (RACSignal *)executeDownloadSignal
+{
+    ALNetworkRequest *request = self;
+    
+    if (self.handleRequest) {
+        request = self.handleRequest(self);
+        if (!request) {
+            return [RACSignal empty];
+        }
+    }
+    
+    @weakify(self);
+    
+    RACSignal *signal = [RACSignal createSignal:^RACDisposable * _Nullable(id<RACSubscriber>  _Nonnull subscriber) {
+        
+        @strongify(self);
+        
+        /// 记录请求起始时间，以订阅的时候开始算起
+        request.req_startTimeInterval = [[NSDate date] timeIntervalSince1970];
+
+        request.req_downloadTask = [ALBaseNetworking downloadWithRequest:request progress:^(float progress) {
+            if (request.req_progressBlock) {
+                request.req_progressBlock(progress);
+            }
+        } success:^(ALNetworkResponse *response, ALNetworkRequest *request) {
+            if (self.handleResponse) {
+                NSError *error = self.handleResponse(response,request);
+                if(!error) {
+                    [subscriber sendNext:response.rawData[@"path"]?:@""];
+                    [subscriber sendCompleted];
+                } else {
+                    [subscriber sendError:error];
+                }
+            } else {
+                [subscriber sendNext:response.rawData[@"path"]?:@""];
+                [subscriber sendCompleted];
+            }
+        } failure:^(ALNetworkRequest *request, BOOL isCache, NSError *error) {
+            if([self handleError:request response:nil isCache:isCache error:error]) {
+                if (self.handleError) {
+                   error = self.handleError(request, nil, error);
+                }
+                [subscriber sendError:error];
+            }
+        }];
+        
+        return nil;
+    }];
+    
+    return signal;
+}
+
+#endif
+
+#pragma mark - private method
+
+/// 判断当前事件是不是要认为是一个错误
+- (BOOL)handleError:(ALNetworkRequest *)request response:(ALNetworkResponse *)response isCache:(BOOL)isCache error:(NSError *)error
+{
+    if (error.code == kNoCacheErrorCode && request.req_cacheStrategy != ALCacheStrategyCacheOnly) { // 无缓存不回调，除非是纯缓存模式
+        return NO;
+    }
+    if (error.code == NSURLErrorCancelled) {
+        return NO;
+    }
+    
+    return YES;
+}
+
+- (void)setExecuteRequest:(void (^)(ALNetworkResponse *, ALNetworkRequest *, NSError *))executeRequest {
+    _executeRequest = executeRequest;
+    
+    if (!executeRequest) {
+        return;
+    }
+    
+    ALNetworkRequest *request = self;
+    
+    if (self.handleRequest) {
+        request = self.handleRequest(self);
+        if (!request) {
+            return;
+        }
+    }
+    
+    // AF内部解开self的循环引用，所以不用弱引用
+    request.req_requestTask = [ALBaseNetworking requestWithRequest:request mockData:request.req_mockData success:^(ALNetworkResponse *response, ALNetworkRequest *req) {
+        
+        if (self.handleResponse) {
+            NSError *error = self.handleResponse(response,req);
+            if(!error) {
+                executeRequest(response,req,nil);
+            } else {
+                executeRequest(nil,req,error);
+            }
+        } else {
+            executeRequest(response,req,nil);
+        }
+    } failure:^(ALNetworkRequest *req, BOOL isCache,id responseObject, NSError *error) {
+        ALNetworkResponse *resp = [[ALNetworkResponse alloc] init];
+        if ([self handleError:req response:resp isCache:isCache error:error]) {
+            resp.rawData = responseObject;
+            NSError *error;
+            // 处理一下错误
+            if (self.handleError) {
+                error = self.handleError(req,resp,error);
+            }
+            executeRequest(resp,req,error);
+        }
+    }];
+}
+
+- (void)setExecuteUploadRequest:(void (^)(ALNetworkResponse *, ALNetworkRequest *, NSError *))executeUploadRequest
+{
+    _executeUploadRequest = executeUploadRequest;
+    
+    if (!executeUploadRequest) {
+        return;
+    }
+    
+    ALNetworkRequest *request = self;
+    
+    if (self.handleRequest) {
+        request = self.handleRequest(request);
+        if (!request) {
+            return;
+        }
+    }
+    
+    request.req_requestTask = [ALBaseNetworking uploadWithRequest:request progress:^(float progress) {
+        if (request.req_progressBlock) {
+            request.req_progressBlock(progress);
+        }
+    } success:^(ALNetworkResponse *response, ALNetworkRequest *request) {
+        
+        if (self.handleResponse) {
+            NSError *error = self.handleResponse(response,request);
+            if(!error) {
+                executeUploadRequest(response,request,nil);
+            } else {
+                executeUploadRequest(nil,request,error);
+            }
+        } else {
+            executeUploadRequest(response,request,nil);
+        }
+    } failure:^(ALNetworkRequest *request, BOOL isCache, NSError *error) {
+        
+        if ([self handleError:request response:nil isCache:isCache error:error]) {
+            NSError *error;
+            // 处理一下错误
+            if (self.handleError) {
+                error = self.handleError(request,nil,error);
+            }
+            executeUploadRequest(nil,request,error);
+        }
+    }];
+}
 
 - (id)copyWithZone:(NSZone *)zone {
     ALNetworkRequest *request = [[ALNetworkRequest alloc] init];

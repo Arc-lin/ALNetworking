@@ -14,12 +14,6 @@
 
 @interface ALNetworking : NSObject
 
-#ifdef RAC
-- (RACSignal<RACTuple *> *)executeSignal;
-
-- (RACSignal *)executeDownloadSignal;
-#endif
-
 /**
  取消当前所有请求
  */
@@ -33,9 +27,9 @@
 #pragma mark - 请求配置
 
 /**
- 请求体
+ 生成一个请求体
  */
-@property (nonatomic, strong, readonly) ALNetworkRequest *request;
+- (ALNetworkRequest *)request;
 
 /** 接口前缀 */
 @property (nonatomic, copy) NSString *prefixUrl;
@@ -61,22 +55,14 @@
 @property (nonatomic, copy) NSError *(^handleResponse)(ALNetworkResponse *response,ALNetworkRequest *request);
 
 /**
- 处理错误
+ 处理链路层错误
+ 上传文件请求和下载文件请求时，response为空
  */
 @property (nonatomic, copy) void(^handleError)(ALNetworkRequest *request,ALNetworkResponse *response,NSError *error);
 
-/**
- 执行请求
- */
-@property (nonatomic, copy) void(^executeRequest)(ALNetworkResponse *response,ALNetworkRequest *request,NSError *error);
-
-/**
- 执行上传文件请求
- */
-@property (nonatomic, copy) void(^executeUploadRequest)(ALNetworkResponse *response,ALNetworkRequest *request, NSError *error);
 
 /** Config类中公用参数的传递方式 */
-@property (nonatomic, assign) ALNetworkingCommonParamsMethod commonParamsMethod;
+@property (nonatomic, assign) ALNetworkingCommonParamsMethod configParamsMethod;
 
 /** networking属性中公用参数的传递方式 */
 @property (nonatomic, assign) ALNetworkingCommonParamsMethod defaultParamsMethod;

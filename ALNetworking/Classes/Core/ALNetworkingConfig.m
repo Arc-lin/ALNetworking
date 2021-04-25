@@ -29,8 +29,4 @@ static ALNetworkingConfig *_instance;
     return _instance;
 }
 
-- (void)setParams:(NSDictionary *)params responseObj:(id)responseObj forUrl:(NSString *)url {
-    [[ALNetworkCache defaultManager] setObject:responseObj forRequestUrl:url params:params memoryOnly:NO];
-}
-
 @end

@@ -31,8 +31,13 @@
         case ALCacheStrategyNetworkOnly:
             dataTask = [self networkWithRequest:req success:success failure:failure];
             break;
-        case ALCacheStrategyCacheOnly:
-            [self cacheWithRequest:req success:success failure:failure];
+        case ALCacheStrategyCacheOnly: {
+            __weak typeof(self) weakSelf = self;
+            [self cacheWithRequest:req success:success failure:^(ALNetworkRequest *request, BOOL isCache, id responseObject, NSError *error) {
+                __strong typeof(weakSelf) strongSelf = weakSelf;
+                dataTask = [strongSelf taskWithRequest:request cacheMemoryOnly:NO success:success failure:failure];
+            }];
+        }
             break;
         case ALCacheStrategyCacheThenNetwork: {
             [self cacheWithRequest:req success:success failure:failure];
@@ -183,7 +188,6 @@
     failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
         if (failure) {
             failure(req,NO,error);
-
         }
     }];
 
@@ -251,7 +255,7 @@
     
     // Set request header
     if (req.req_header && req.req_header.allKeys.count > 0) {
-        [req.header enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull key, id obj, BOOL * _Nonnull stop) {
+        [req.req_header enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull key, id obj, BOOL * _Nonnull stop) {
             [requestSerializer setValue:obj forHTTPHeaderField:key];
         }];
     }

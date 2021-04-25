@@ -5,9 +5,9 @@
 //  Created by Arclin on 2019/12/15.
 //
 
-#import "ALNetworking+Coobjc.h"
+#import "ALNetworkRequest+Coobjc.h"
 
-@implementation ALNetworking (Coobjc)
+@implementation ALNetworkRequest (Coobjc)
 
 - (COPromise *)co_executeRequest CO_ASYNC
 {

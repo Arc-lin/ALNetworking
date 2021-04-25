@@ -7,17 +7,17 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		3508C142231505FD005EF141 /* ALSecondViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3508C141231505FD005EF141 /* ALSecondViewController.m */; };
+		183D510C26355BEA0015E42C /* ALTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 183D510B26355BEA0015E42C /* ALTableViewController.m */; };
+		183D511326355DDF0015E42C /* ALRequestViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 183D511226355DDF0015E42C /* ALRequestViewController.m */; };
 		357FADDD23A79AE700E891BA /* COPromise+ALNetworking.m in Sources */ = {isa = PBXBuildFile; fileRef = 357FADDC23A79AE700E891BA /* COPromise+ALNetworking.m */; };
 		357FADE023A79CC000E891BA /* TestModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 357FADDF23A79CC000E891BA /* TestModel.m */; };
-		35D40BD923A66EC60024E854 /* ALNetworking+Coobjc.m in Sources */ = {isa = PBXBuildFile; fileRef = 35D40BD823A66EC60024E854 /* ALNetworking+Coobjc.m */; };
+		35D40BD923A66EC60024E854 /* ALNetworkRequest+Coobjc.m in Sources */ = {isa = PBXBuildFile; fileRef = 35D40BD823A66EC60024E854 /* ALNetworkRequest+Coobjc.m */; };
 		6003F58E195388D20070C39A /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6003F58D195388D20070C39A /* Foundation.framework */; };
 		6003F590195388D20070C39A /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6003F58F195388D20070C39A /* CoreGraphics.framework */; };
 		6003F592195388D20070C39A /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6003F591195388D20070C39A /* UIKit.framework */; };
 		6003F598195388D20070C39A /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6003F596195388D20070C39A /* InfoPlist.strings */; };
 		6003F59A195388D20070C39A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 6003F599195388D20070C39A /* main.m */; };
 		6003F59E195388D20070C39A /* ALAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 6003F59D195388D20070C39A /* ALAppDelegate.m */; };
-		6003F5A7195388D20070C39A /* ALViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6003F5A6195388D20070C39A /* ALViewController.m */; };
 		6003F5A9195388D20070C39A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6003F5A8195388D20070C39A /* Images.xcassets */; };
 		6003F5B0195388D20070C39A /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6003F5AF195388D20070C39A /* XCTest.framework */; };
 		6003F5B1195388D20070C39A /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6003F58D195388D20070C39A /* Foundation.framework */; };
@@ -44,16 +44,18 @@
 		0964D72BFDF48C751BAA4214 /* Pods-ALNetworking_Example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ALNetworking_Example.release.xcconfig"; path = "Pods/Target Support Files/Pods-ALNetworking_Example/Pods-ALNetworking_Example.release.xcconfig"; sourceTree = "<group>"; };
 		0AD57AAE9CD4CD8A30DD7DF4 /* libPods-ALNetworking_Tests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-ALNetworking_Tests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		0DA90E468C76CFBB40C4C7CF /* Pods-ALNetworking_Example.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ALNetworking_Example.debug.xcconfig"; path = "Pods/Target Support Files/Pods-ALNetworking_Example/Pods-ALNetworking_Example.debug.xcconfig"; sourceTree = "<group>"; };
+		183D510A26355BEA0015E42C /* ALTableViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ALTableViewController.h; sourceTree = "<group>"; };
+		183D510B26355BEA0015E42C /* ALTableViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ALTableViewController.m; sourceTree = "<group>"; };
+		183D511126355DDF0015E42C /* ALRequestViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ALRequestViewController.h; sourceTree = "<group>"; };
+		183D511226355DDF0015E42C /* ALRequestViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ALRequestViewController.m; sourceTree = "<group>"; };
 		22385481933B986ADA49EEBE /* Pods-ALNetworking_Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ALNetworking_Tests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-ALNetworking_Tests/Pods-ALNetworking_Tests.debug.xcconfig"; sourceTree = "<group>"; };
 		29ABB7F95F65F063A9534112 /* ALNetworking.podspec */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = ALNetworking.podspec; path = ../ALNetworking.podspec; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
-		3508C140231505FD005EF141 /* ALSecondViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ALSecondViewController.h; sourceTree = "<group>"; };
-		3508C141231505FD005EF141 /* ALSecondViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ALSecondViewController.m; sourceTree = "<group>"; };
 		357FADDB23A79AE700E891BA /* COPromise+ALNetworking.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "COPromise+ALNetworking.h"; sourceTree = "<group>"; };
 		357FADDC23A79AE700E891BA /* COPromise+ALNetworking.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "COPromise+ALNetworking.m"; sourceTree = "<group>"; };
 		357FADDE23A79CC000E891BA /* TestModel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TestModel.h; sourceTree = "<group>"; };
 		357FADDF23A79CC000E891BA /* TestModel.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TestModel.m; sourceTree = "<group>"; };
-		35D40BD723A66EC60024E854 /* ALNetworking+Coobjc.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "ALNetworking+Coobjc.h"; sourceTree = "<group>"; };
-		35D40BD823A66EC60024E854 /* ALNetworking+Coobjc.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "ALNetworking+Coobjc.m"; sourceTree = "<group>"; };
+		35D40BD723A66EC60024E854 /* ALNetworkRequest+Coobjc.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "ALNetworkRequest+Coobjc.h"; sourceTree = "<group>"; };
+		35D40BD823A66EC60024E854 /* ALNetworkRequest+Coobjc.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "ALNetworkRequest+Coobjc.m"; sourceTree = "<group>"; };
 		374420BA0297FED968D41A07 /* Pods-MMCNetworking_Example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MMCNetworking_Example.release.xcconfig"; path = "Pods/Target Support Files/Pods-MMCNetworking_Example/Pods-MMCNetworking_Example.release.xcconfig"; sourceTree = "<group>"; };
 		3851566DE03BDF0161977EE5 /* Pods-MMCNetworking_Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MMCNetworking_Tests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-MMCNetworking_Tests/Pods-MMCNetworking_Tests.debug.xcconfig"; sourceTree = "<group>"; };
 		6003F58A195388D20070C39A /* ALNetworking_Example.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ALNetworking_Example.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -66,8 +68,6 @@
 		6003F59B195388D20070C39A /* ALNetworking-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "ALNetworking-Prefix.pch"; sourceTree = "<group>"; };
 		6003F59C195388D20070C39A /* ALAppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ALAppDelegate.h; sourceTree = "<group>"; };
 		6003F59D195388D20070C39A /* ALAppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ALAppDelegate.m; sourceTree = "<group>"; };
-		6003F5A5195388D20070C39A /* ALViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ALViewController.h; sourceTree = "<group>"; };
-		6003F5A6195388D20070C39A /* ALViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ALViewController.m; sourceTree = "<group>"; };
 		6003F5A8195388D20070C39A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		6003F5AE195388D20070C39A /* ALNetworking_Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ALNetworking_Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		6003F5AF195388D20070C39A /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
@@ -150,15 +150,15 @@
 				6003F59C195388D20070C39A /* ALAppDelegate.h */,
 				6003F59D195388D20070C39A /* ALAppDelegate.m */,
 				873B8AEA1B1F5CCA007FD442 /* Main.storyboard */,
-				6003F5A5195388D20070C39A /* ALViewController.h */,
-				6003F5A6195388D20070C39A /* ALViewController.m */,
-				3508C140231505FD005EF141 /* ALSecondViewController.h */,
-				3508C141231505FD005EF141 /* ALSecondViewController.m */,
+				183D510A26355BEA0015E42C /* ALTableViewController.h */,
+				183D510B26355BEA0015E42C /* ALTableViewController.m */,
+				183D511126355DDF0015E42C /* ALRequestViewController.h */,
+				183D511226355DDF0015E42C /* ALRequestViewController.m */,
 				71719F9D1E33DC2100824A3D /* LaunchScreen.storyboard */,
 				6003F5A8195388D20070C39A /* Images.xcassets */,
 				6003F594195388D20070C39A /* Supporting Files */,
-				35D40BD723A66EC60024E854 /* ALNetworking+Coobjc.h */,
-				35D40BD823A66EC60024E854 /* ALNetworking+Coobjc.m */,
+				35D40BD723A66EC60024E854 /* ALNetworkRequest+Coobjc.h */,
+				35D40BD823A66EC60024E854 /* ALNetworkRequest+Coobjc.m */,
 				357FADDB23A79AE700E891BA /* COPromise+ALNetworking.h */,
 				357FADDC23A79AE700E891BA /* COPromise+ALNetworking.m */,
 				357FADDE23A79CC000E891BA /* TestModel.h */,
@@ -268,9 +268,9 @@
 		6003F582195388D10070C39A /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				CLASSPREFIX = MMC;
-				LastUpgradeCheck = 0720;
-				ORGANIZATIONNAME = "广东灵机文化传播有限公司（本内容仅限于广东灵机文化传播有限公司内部传阅，禁止外泄以及用于其他的商业目的）";
+				CLASSPREFIX = AL;
+				LastUpgradeCheck = 1240;
+				ORGANIZATIONNAME = "";
 				TargetAttributes = {
 					6003F589195388D20070C39A = {
 						DevelopmentTeam = 2Q328WGVZP;
@@ -367,11 +367,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3508C142231505FD005EF141 /* ALSecondViewController.m in Sources */,
 				6003F59E195388D20070C39A /* ALAppDelegate.m in Sources */,
-				35D40BD923A66EC60024E854 /* ALNetworking+Coobjc.m in Sources */,
-				6003F5A7195388D20070C39A /* ALViewController.m in Sources */,
+				35D40BD923A66EC60024E854 /* ALNetworkRequest+Coobjc.m in Sources */,
+				183D510C26355BEA0015E42C /* ALTableViewController.m in Sources */,
 				6003F59A195388D20070C39A /* main.m in Sources */,
+				183D511326355DDF0015E42C /* ALRequestViewController.m in Sources */,
 				357FADE023A79CC000E891BA /* TestModel.m in Sources */,
 				357FADDD23A79AE700E891BA /* COPromise+ALNetworking.m in Sources */,
 			);
@@ -427,23 +427,38 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
@@ -456,7 +471,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -467,29 +482,44 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = YES;
 				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
@@ -507,7 +537,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "ALNetworking/ALNetworking-Prefix.pch";
 				INFOPLIST_FILE = "ALNetworking/ALNetworking-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				MODULE_NAME = ExampleApp;
 				PRODUCT_BUNDLE_IDENTIFIER = com.xyl.ling;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -527,7 +557,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "ALNetworking/ALNetworking-Prefix.pch";
 				INFOPLIST_FILE = "ALNetworking/ALNetworking-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				MODULE_NAME = ExampleApp;
 				PRODUCT_BUNDLE_IDENTIFIER = com.xyl.ling;
 				PRODUCT_NAME = "$(TARGET_NAME)";

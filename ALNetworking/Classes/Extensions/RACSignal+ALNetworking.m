@@ -8,7 +8,7 @@
 
 #import "RACSignal+ALNetworking.h"
 #import "ALNetworkResponse.h"
-#import "ALNetworking.h"
+#import "ALNetworkRequest.h"
 #import <MJExtension/MJExtension.h>
 #import "ALBlockTrampoline.h"
 

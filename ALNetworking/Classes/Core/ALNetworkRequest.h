@@ -8,7 +8,7 @@
 #import <Foundation/Foundation.h>
 #import "ALNetworkingConst.h"
 
-@class AFHTTPRequestSerializer,AFHTTPResponseSerializer;
+@class ALNetworkResponse;
 
 @interface ALNetworkRequest : NSObject<NSCopying>
 
@@ -48,18 +48,6 @@
 /// 参数类型
 - (ALNetworkRequest * (^)(ALNetworkRequestParamsType paramsType))paramsType;
 
-/// 上传数据
-- (ALNetworkRequest * (^)(NSData *data,NSString *fileName,NSString *mimeType))uploadData;
-
-/// 上传文件承载的字段名
-- (ALNetworkRequest * (^)(NSString *))fileFieldName;
-
-/** 上传文件时，请在适当的地方调用这个方法，清理掉一些旧数据 **/
-- (ALNetworkRequest *)prepareForUpload;
-
-/** 文件上传/下载进度 */
-- (ALNetworkRequest * (^)(void(^handleProgress)(float progress)))progress;
-
 /**
  请求的唯一标识符
  */
@@ -75,8 +63,59 @@
  */
 - (ALNetworkRequest * (^)(ALNetworkingConfigType configType))disableDynamicHeader;
 
+#pragma mark - 文件上传
+
+/// 上传数据
+- (ALNetworkRequest * (^)(NSData *data,NSString *fileName,NSString *mimeType))uploadData;
+
+/// 上传文件承载的字段名
+- (ALNetworkRequest * (^)(NSString *))fileFieldName;
+
+/** 文件上传/下载进度 */
+- (ALNetworkRequest * (^)(void(^handleProgress)(float progress)))progress;
+
+#pragma mark - 文件下载
+
 /// 下载目的路径
 - (ALNetworkRequest *(^)(NSString *destPath))downloadDestPath;
+
+#pragma mark - 拦截处理
+
+/**
+ 请求前拦截请求体处理 如果需要取消请求则返回空值
+ */
+@property (nonatomic, copy) ALNetworkRequest *(^handleRequest)(ALNetworkRequest *request);
+
+/**
+ 根据需求处理回调信息判断是否是正确的业务返回结果
+ */
+@property (nonatomic, copy) NSError *(^handleResponse)(ALNetworkResponse *response,ALNetworkRequest *request);
+
+#pragma mark - 执行请求
+
+/**
+ 执行请求
+ */
+@property (nonatomic, copy) void(^executeRequest)(ALNetworkResponse *response,ALNetworkRequest *request,NSError *error);
+
+/**
+ 执行上传文件请求
+ */
+@property (nonatomic, copy) void(^executeUploadRequest)(ALNetworkResponse *response,ALNetworkRequest *request, NSError *error);
+
+#ifdef RAC
+
+- (RACSignal<RACTuple *> *)executeSignal;
+
+- (RACSignal *)executeDownloadSignal;
+
+#endif
+#pragma mark - 回调处理
+
+/**
+ 处理错误
+ */
+@property (nonatomic, copy) NSError *(^handleError)(ALNetworkRequest *request,ALNetworkResponse *response,NSError *error);
 
 #pragma mark - 外部获取数据
 
@@ -133,9 +172,6 @@
 /** 自定义属性 */
 @property (nonatomic, strong, readonly) NSMutableDictionary<NSString *,id<NSCopying>> *req_customProperty;
 
-/** 假数据 */
-@property (nonatomic, strong, readonly) id<NSCopying>                req_mockData;
-
 /** SSL证书 */
 @property (nonatomic, copy, readonly) NSString                       *req_sslCerPath;
 
@@ -153,9 +189,5 @@
 
 /** 下载路径 */
 @property (nonatomic, copy, readonly) NSString                      *req_destPath;
-
-/** 上传/下载进度 */
-@property (nonatomic, copy, readonly) void(^req_progressBlock)(float progress);
-
 
 @end

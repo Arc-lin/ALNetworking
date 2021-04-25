@@ -43,13 +43,4 @@
 /** 动态添加请求头，每次执行网络请求前都会访问一遍 修改的值优先级最低 */
 @property (nonatomic, copy) NSDictionary *(^dynamicHeaderConfig)(ALNetworkRequest *request);
 
-/**
- 设置特定的参数和响应体, 一般是用来做假数据用，需要在请求链中使用ALCacheStrategyCacheOnly，使用其他缓存机制有可能会被网络数据覆盖
-
- @param params 参数
- @param responseObj 响应体
- @param url 接口地址
- */
-- (void)setParams:(NSDictionary *)params responseObj:(id)responseObj forUrl:(NSString *)url;
-
 @end

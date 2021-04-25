@@ -7,7 +7,8 @@
 
 #import "COPromise+ALNetworking.h"
 #import <coobjc.h>
-#import <ALNetworking.h>
+#import <ALNetworkRequest.h>
+#import <ALNetworkResponse.h>
 #import <MJExtension.h>
 
 @implementation COPromise (ALNetworking)
