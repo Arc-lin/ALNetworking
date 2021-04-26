@@ -107,7 +107,7 @@
         NSString *urlStr;
         
         NSString *utf8Url = [url stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]];
-
+        
         if ([url hasPrefix:@"http://"] || [url hasPrefix:@"https://"]) {
             self.req_urlStr = utf8Url;
             return self;
@@ -295,16 +295,16 @@
             return [RACSignal empty];
         }
     }
-
+    
     @weakify(self);
     
     RACSignal *signal = [RACSignal createSignal:^RACDisposable *(id<RACSubscriber> subscriber) {
         
         @strongify(self);
-
+        
         /// 记录请求起始时间，以订阅的时候开始算起
         request.req_startTimeInterval = [[NSDate date] timeIntervalSince1970];
-
+        
         request.req_requestTask = [ALBaseNetworking requestWithRequest:request mockData:request.req_mockData success:^(ALNetworkResponse *response, ALNetworkRequest *req) {
             
             if (self.handleResponse) {
@@ -313,7 +313,7 @@
                     [subscriber sendNext:RACTuplePack(response,req)];
                 }
                 if (req.req_cacheStrategy == ALCacheStrategyCacheThenNetwork) {
-                    if (!response.isCache) { // 如果是缓存模式，则不发送sendError和sendComplete
+                    if (!response.isCache) { // 回调需要执行两次的情况下，如果不是缓存模式，才发送sendError和sendComplete
                         if (error) {
                             [subscriber sendError:error];
                         } else {
@@ -345,13 +345,17 @@
                 response.rawData = responseObject;
                 NSError *error;
                 if (self.handleError) {
-                   error = self.handleError(request, response, error);
+                    error = self.handleError(request, response, error);
                 }
                 [subscriber sendError:error];
             }
             
         }];
-        return nil;
+        
+        @weakify(request);
+        return [RACDisposable disposableWithBlock:^{
+            [request_weak_.req_requestTask cancel];
+        }];
     }];
     
     request = nil;
@@ -359,9 +363,63 @@
     return signal;
 }
 
+- (RACSignal *)executeUploadSignal {
+    ALNetworkRequest *request = self;
+    
+    if (self.handleRequest) {
+        request = self.handleRequest(self);
+        if (request) {
+            return [RACSignal empty];
+        }
+    }
+    
+    @weakify(self);
+    
+    RACSignal *signal = [RACSignal createSignal:^RACDisposable * _Nullable(id<RACSubscriber>  _Nonnull subscriber) {
+        @strongify(self);
+        
+        /// 记录请求起始时间，以订阅的时候开始算起
+        request.req_startTimeInterval = [[NSDate date] timeIntervalSince1970];
+        
+        request.req_requestTask = [ALBaseNetworking uploadWithRequest:request progress:^(float progress) {
+            if (request.req_progressBlock) {
+                request.req_progressBlock(progress);
+            }
+        } success:^(ALNetworkResponse *resp, ALNetworkRequest *req) {
+            if (self.handleResponse) {
+                NSError *error = self.handleResponse(resp,req);
+                if(!error) {
+                    [subscriber sendNext:RACTuplePack(resp,req)];
+                } else {
+                    [subscriber sendError:error];
+                    return;
+                }
+            } else {
+                [subscriber sendNext:RACTuplePack(resp,req)];
+            }
+            [subscriber sendCompleted];
+        } failure:^(ALNetworkRequest *request, BOOL isCache, NSError *error) {
+            
+            if ([self handleError:request response:nil isCache:isCache error:error]) {
+                NSError *error;
+                // 处理一下错误
+                if (self.handleError) {
+                    error = self.handleError(request,nil,error);
+                }
+                [subscriber sendError:error];
+            }
+        }];
+        
+        @weakify(request);
+        return [RACDisposable disposableWithBlock:^{
+            [request_weak_.req_requestTask cancel];
+        }];
+    }];
+    
+    return signal;
+}
 
-- (RACSignal *)executeDownloadSignal
-{
+- (RACSignal *)executeDownloadSignal {
     ALNetworkRequest *request = self;
     
     if (self.handleRequest) {
@@ -379,7 +437,7 @@
         
         /// 记录请求起始时间，以订阅的时候开始算起
         request.req_startTimeInterval = [[NSDate date] timeIntervalSince1970];
-
+        
         request.req_downloadTask = [ALBaseNetworking downloadWithRequest:request progress:^(float progress) {
             if (request.req_progressBlock) {
                 request.req_progressBlock(progress);
@@ -400,13 +458,16 @@
         } failure:^(ALNetworkRequest *request, BOOL isCache, NSError *error) {
             if([self handleError:request response:nil isCache:isCache error:error]) {
                 if (self.handleError) {
-                   error = self.handleError(request, nil, error);
+                    error = self.handleError(request, nil, error);
                 }
                 [subscriber sendError:error];
             }
         }];
         
-        return nil;
+        @weakify(request);
+        return [RACSerialDisposable disposableWithBlock:^{
+            [request_weak_.req_downloadTask cancel];
+        }];
     }];
     
     return signal;
@@ -518,6 +579,49 @@
     }];
 }
 
+- (void)setExecuteDownloadRequest:(void (^)(ALNetworkResponse *, ALNetworkRequest *, NSError *))executeDownloadRequest {
+    _executeDownloadRequest = executeDownloadRequest;
+    
+    if (!executeDownloadRequest) {
+        return;
+    }
+    
+    ALNetworkRequest *request = self;
+    
+    if (self.handleRequest) {
+        request = self.handleRequest(request);
+        if (!request) {
+            return;
+        }
+    }
+    
+    request.req_downloadTask = [ALBaseNetworking downloadWithRequest:request progress:^(float progress) {
+        if (request.req_progressBlock) {
+            request.req_progressBlock(progress);
+        }
+    } success:^(ALNetworkResponse *response, ALNetworkRequest *request) {
+        if (self.handleResponse) {
+            NSError *error = self.handleResponse(response,request);
+            if(!error) {
+                executeDownloadRequest(response,request,nil);
+            } else {
+                executeDownloadRequest(nil,request,error);
+            }
+        } else {
+            executeDownloadRequest(response,request,nil);
+        }
+    } failure:^(ALNetworkRequest *request, BOOL isCache, NSError *error) {
+        if ([self handleError:request response:nil isCache:isCache error:error]) {
+            NSError *error;
+            // 处理一下错误
+            if (self.handleError) {
+                error = self.handleError(request,nil,error);
+            }
+            executeDownloadRequest(nil,request,error);
+        }
+    }];
+}
+
 - (id)copyWithZone:(NSZone *)zone {
     ALNetworkRequest *request = [[ALNetworkRequest alloc] init];
     request.req_urlStr = self.req_urlStr;
@@ -597,6 +701,10 @@
         _req_customProperty = [NSMutableDictionary dictionary];
     }
     return _req_customProperty;
+}
+
+- (void)dealloc {
+    
 }
 
 @end

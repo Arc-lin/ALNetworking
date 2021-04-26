@@ -148,9 +148,9 @@
                 resp.isCache = NO;
                 resp.rawData = responseObject;
                 success(resp,req);
-//                                      LMLog(@"%@\n%@\n%@\n%@",req.urlStr,req.header.mj_JSONString,req.params.mj_JSONString,responseObject);
             }
         }
+//        [mgr invalidateSessionCancelingTasks:YES resetSession:YES];
     }];
     [dataTask resume];
     

@@ -103,9 +103,17 @@
  */
 @property (nonatomic, copy) void(^executeUploadRequest)(ALNetworkResponse *response,ALNetworkRequest *request, NSError *error);
 
+/**
+ 执行下载文件请求
+ */
+@property (nonatomic, copy) void(^executeDownloadRequest)(ALNetworkResponse *response,ALNetworkRequest *request, NSError *error);
+
+
 #ifdef RAC
 
 - (RACSignal<RACTuple *> *)executeSignal;
+
+- (RACSignal *)executeUploadSignal;
 
 - (RACSignal *)executeDownloadSignal;
 

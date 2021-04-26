@@ -24,7 +24,11 @@
     
     self.view.backgroundColor = [UIColor whiteColor];
     
-    self.networkRequest.get(@"/new/wbtop").header(@{@"priority_header" : @"innerHeader"}).params(@{@"priority_params" : @"innerParams"}).executeRequest = ^(ALNetworkResponse *response, ALNetworkRequest *request, NSError *error) {
+    self.networkRequest
+    .get(@"/new/wbtop")
+//    .header(@{@"priority_header" : @"innerHeader"})
+//    .params(@{@"priority_params" : @"innerParams"})
+    .executeRequest = ^(ALNetworkResponse *response, ALNetworkRequest *request, NSError *error) {
         NSLog(@"URL:%@\nHEADER:%@\nPARAMS:%@\nResult:\n%@ \n Error : %@",request.req_urlStr,request.req_header,request.req_params,response.rawData,error);
     };
     
@@ -40,11 +44,11 @@
         _networking.prefixUrl = @"https://v2.alapi.cn/api";
         _networking.defaultHeader = @{
             @"test_private_header" : @"private_header",
-            @"priority_header" : @"privateHeader"
+//            @"priority_header" : @"privateHeader"
         };
         _networking.defaultParams = @{
             @"test_private_params" : @"private_params",
-            @"priority_params" : @"privateParams"
+//            @"priority_params" : @"privateParams"
         };
         _networking.handleRequest = ^ALNetworkRequest *(ALNetworkRequest *request) {
             if ([request.req_customProperty.allKeys containsObject:@"customKey"]) {
@@ -86,8 +90,8 @@
                 @"priority_params" : @"privateDynamicParams"
             };
         };
-        _networking.ignoreDefaultHeader = NO;
-        _networking.ignoreDefaultParams = NO;
+        _networking.ignoreDefaultHeader = YES;
+        _networking.ignoreDefaultParams = YES;
         _networking.configParamsMethod = ALNetworkingCommonParamsMethodFollowMethod;
         _networking.defaultParamsMethod = ALNetworkingCommonParamsMethodFollowMethod;
         
