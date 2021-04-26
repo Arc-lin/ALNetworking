@@ -37,10 +37,10 @@
  */
 @property (nonatomic, assign) BOOL distinguishError;
 
-/** 动态添加参数，每次执行网络请求前都会访问一遍 修改的值优先级最低 */
+/** 动态添加参数，每次执行网络请求前都会访问一遍，修改的值优先级最低 */
 @property (nonatomic, copy) NSDictionary *(^dynamicParamsConfig)(ALNetworkRequest *request);
 
-/** 动态添加请求头，每次执行网络请求前都会访问一遍 修改的值优先级最低 */
+/** 动态添加请求头，每次执行网络请求前都会访问一遍，修改的值优先级最低 */
 @property (nonatomic, copy) NSDictionary *(^dynamicHeaderConfig)(ALNetworkRequest *request);
 
 @end

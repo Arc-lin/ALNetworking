@@ -20,7 +20,7 @@ Pod::Spec.new do |s|
         ss.dependency 'AFNetworking'
         ss.dependency 'YYCache'
         ss.source_files = 'ALNetworking/Classes/Core/**/*'
-    end
+    end 
     s.subspec 'RAC' do |ss|
         ss.prefix_header_contents = '#import <ReactiveObjC/ReactiveObjC.h>'
         ss.source_files = 'ALNetworking/Classes/Core/**/*'

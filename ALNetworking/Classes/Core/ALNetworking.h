@@ -68,12 +68,12 @@
 @property (nonatomic, assign) ALNetworkingCommonParamsMethod defaultParamsMethod;
 
 /**
- 动态参数的配置，每次执行请求都会加上这次的参数
+ 动态参数的配置，每次执行请求都会加上这次的参数，请求时才会访问这个block
  */
 @property (nonatomic, copy) NSDictionary *(^dynamicParamsConfig)(ALNetworkRequest *request);
 
 /**
- 动态请求头的配置，每次执行请求都会加上这次的请求头
+ 动态请求头的配置，每次执行请求都会加上这次的请求头，请求时才会访问这个block
  */
 @property (nonatomic, copy) NSDictionary *(^dynamicHeaderConfig)(ALNetworkRequest *request);
 
