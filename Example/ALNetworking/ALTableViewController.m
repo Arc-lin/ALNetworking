@@ -25,7 +25,7 @@
     ALNetworkingConfig *config = [ALNetworkingConfig defaultConfig];
     config.defaultPrefixUrl = @"https://v2.alapi.cn";
     config.timeoutInterval = 10;
-    config.defaultCacheStrategy = ALCacheStrategyAutomatic;
+    config.defaultCacheStrategy = ALCacheStrategyNetworkOnly;
     config.distinguishError = YES;
     config.defaultHeader = @{
         @"test_config_header" : @"config_header",

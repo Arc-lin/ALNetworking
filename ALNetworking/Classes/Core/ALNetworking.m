@@ -14,6 +14,12 @@
 #import <AFNetworking/AFNetworking.h>
 #import "ALAPIClient.h"
 
+#define ALLOCK(block) {\
+[self.lock lock];\
+block\
+[self.lock unlock];\
+}
+
 @interface ALNetworking()
 
 /**
@@ -23,6 +29,9 @@
 
 /// 请求起始时间
 @property (nonatomic, strong) NSMutableDictionary *requestTimeDictionary;
+
+/// 递归锁
+@property (nonatomic, strong) NSRecursiveLock *lock;
 
 @end
 
@@ -38,21 +47,24 @@
     
     /// 处理公共请求头
     NSMutableDictionary *defaultHeader = [NSMutableDictionary dictionary];
-    if (!self.ignoreDefaultHeader) {
-        [defaultHeader setValuesForKeysWithDictionary:[ALNetworkingConfig defaultConfig].defaultHeader];
+    if (!self.ignoreDefaultHeader && [ALNetworkingConfig defaultConfig].defaultHeader) {
+        [defaultHeader addEntriesFromDictionary:[ALNetworkingConfig defaultConfig].defaultHeader];
     }
     
+    /// 处理私有请求头
     if (self.defaultHeader) {
-        [defaultHeader setValuesForKeysWithDictionary:self.defaultHeader];
+        [defaultHeader addEntriesFromDictionary:self.defaultHeader];
     }
     
     /// 处理公共参数
     NSMutableDictionary *defaultParams = [NSMutableDictionary dictionary];
-    if (!self.ignoreDefaultParams && self.configParamsMethod == ALNetworkingCommonParamsMethodFollowMethod) {
-        [defaultParams setValuesForKeysWithDictionary:[ALNetworkingConfig defaultConfig].defaultParams];
+    if (!self.ignoreDefaultParams && self.configParamsMethod == ALNetworkingCommonParamsMethodFollowMethod && [ALNetworkingConfig defaultConfig].defaultParams) {
+        [defaultParams addEntriesFromDictionary:[ALNetworkingConfig defaultConfig].defaultParams];
     }
+    
+    /// 处理私有参数
     if (self.defaultParams) {
-        [defaultParams setValuesForKeysWithDictionary:self.defaultParams];
+        [defaultParams addEntriesFromDictionary:self.defaultParams];
     }
     
     ALNetworkRequest *request = [[ALNetworkRequest alloc] initWithBaseUrl:baseUrl
@@ -62,31 +74,33 @@
     
     __weak typeof(self) weakSelf = self;
     
-    if (self.handleResponse) {
-        request.handleResponse = ^NSError *(ALNetworkResponse *response, ALNetworkRequest *request) {
-            __strong typeof(self) self = weakSelf;
-            // 网络请求完成取消请求
-            if (!response.isCache) {
-                [self cancelRequestWithName:request.req_name];
-            }
+    request.handleResponse = ^NSError *(ALNetworkResponse *response, ALNetworkRequest *request) {
+        __strong typeof(self) self = weakSelf;
+        // 网络请求完成取消请求
+        if (!response.isCache) {
+            [self cancelRequestWithName:request.req_name];
+        }
+        if (self.handleResponse) {
             return self.handleResponse(response,request);
-        };
-    }
+        } else {
+            return nil;
+        }
+    };
     
-    if (self.handleError) {
-        request.handleError = ^(ALNetworkRequest *request, ALNetworkResponse *response, NSError *error) {
-            __strong typeof(self) self = weakSelf;
-            if (!response.isCache) {
-                [self cancelRequestWithName:request.req_name];
-            }
-            if ([ALNetworkingConfig defaultConfig].distinguishError == NO &&
-                self.handleResponse && response) {
-                error = self.handleResponse(response,request);
-            }
+    request.handleError = ^(ALNetworkRequest *request, ALNetworkResponse *response, NSError *error) {
+        __strong typeof(self) self = weakSelf;
+        if (!response.isCache) {
+            [self cancelRequestWithName:request.req_name];
+        }
+        if ([ALNetworkingConfig defaultConfig].distinguishError == NO &&
+            self.handleResponse && response) {
+            error = self.handleResponse(response,request);
+        }
+        if (self.handleError) {
             self.handleError(request, response, error);
-            return error;
-        };
-    }
+        }
+        return error;
+    };
     
     request.handleRequest = ^ALNetworkRequest *(ALNetworkRequest *request) {
         __strong typeof(self) self = weakSelf;
@@ -98,20 +112,20 @@
     
             if (!request.isForce) { // 不是强制请求，判断是否大于最短时间间隔
                 NSTimeInterval startTime = 0;
-                @synchronized (self) {
+                ALLOCK(
                     if ([self.requestTimeDictionary.allKeys containsObject:keyName]) {
                         startTime = [self.requestTimeDictionary[keyName] doubleValue];
                     }
-                }
+                )
                 if (startTime > 0) {
                     if (currentTimeInterval - startTime < request.req_repeatRequestInterval) {
                         return nil;
                     }
                 }
             }
-            @synchronized (self) {
+            ALLOCK(
                 [self.requestTimeDictionary setObject:@(currentTimeInterval) forKey:keyName];
-            }
+            )
         }
         
         /// 防止改动了不必要的东西，所以复制一份
@@ -128,23 +142,26 @@
             request.req_urlStr = [self stringWithURLString:request.req_urlStr params:self.defaultParams];
         }
         
-        if (request.req_disableDynamicParams == ALNetworkingConfigTypeAll) {
+        if (request.req_disableDynamicParams == ALNetworkingConfigTypeAll &&
+            request.req_disableDynamicHeader == ALNetworkingConfigTypeAll) {
             return request;
         }
         
         /// 处理动态参数
         NSMutableDictionary *pramsDic = [NSMutableDictionary dictionary];
         
-        /// 公有头部优先级最低
-        if (request.req_disableDynamicParams != ALNetworkingConfigTypePublic && config.dynamicParamsConfig) {
+        /// 公有参数优先级最低
+        if (request.req_disableDynamicParams != ALNetworkingConfigTypePublic &&
+            request.req_disableDynamicParams != ALNetworkingConfigTypeAll    && config.dynamicParamsConfig) {
             NSDictionary *configParams = config.dynamicParamsConfig(requestCopy);
             if (configParams) {
                 [pramsDic addEntriesFromDictionary:configParams];
             }
         }
         
-        /// 私有头部优先级第二
-        if (request.req_disableDynamicParams != ALNetworkingConfigTypePrivate && self.dynamicParamsConfig) {
+        /// 私有参数优先级第二
+        if (request.req_disableDynamicParams != ALNetworkingConfigTypePrivate && request.req_disableDynamicParams != ALNetworkingConfigTypeAll     &&
+            self.dynamicParamsConfig) {
             NSDictionary *innerParams = self.dynamicParamsConfig(requestCopy);
             if (innerParams) {
                 [pramsDic addEntriesFromDictionary:innerParams];
@@ -156,22 +173,25 @@
             [pramsDic addEntriesFromDictionary:request.req_inputParams];
         }
         
-        request.req_params = pramsDic;
+        [request.req_params addEntriesFromDictionary:pramsDic];
         
         /// 处理动态头部
         NSMutableDictionary *headerDic = [NSMutableDictionary dictionary];
         
         /// 公有头部优先级最低
-        if (request.req_disableDynamicHeader != ALNetworkingConfigTypePublic && config.dynamicHeaderConfig) {
-            NSDictionary *configHeader = config.dynamicHeaderConfig(request);
+        if (request.req_disableDynamicHeader != ALNetworkingConfigTypePublic &&
+            request.req_disableDynamicHeader != ALNetworkingConfigTypeAll    &&
+            config.dynamicHeaderConfig) {
+            NSDictionary *configHeader = config.dynamicHeaderConfig(requestCopy);
             if (configHeader) {
                 [headerDic addEntriesFromDictionary:configHeader];
             }
         }
         
         /// 私有头部优先级第二
-        if (request.req_disableDynamicHeader != ALNetworkingConfigTypePrivate && self.dynamicHeaderConfig) {
-            NSDictionary *innerHeader = self.dynamicHeaderConfig(request);
+        if (request.req_disableDynamicHeader != ALNetworkingConfigTypePrivate && request.req_disableDynamicHeader != ALNetworkingConfigTypeAll     &&
+            self.dynamicHeaderConfig) {
+            NSDictionary *innerHeader = self.dynamicHeaderConfig(requestCopy);
             if (innerHeader) {
                 [headerDic addEntriesFromDictionary:innerHeader];
             }
@@ -182,16 +202,16 @@
             [headerDic addEntriesFromDictionary:request.req_inputHeader];
         }
         
-        request.req_header = headerDic;
+        [request.req_header addEntriesFromDictionary:headerDic];
         
         /// 最后的最后就交给外面去处理了
         if (self.handleRequest) {
             request = self.handleRequest(request);
         }
         
-        @synchronized (self) {
+        ALLOCK(
             [self.requestDictionary setObject:request forKey:request.req_name];
-        }
+        )
        
         return request;
     };
@@ -206,20 +226,24 @@
         [queryItems addObject:[NSURLQueryItem queryItemWithName:key value:obj]];
     }];
     components.queryItems = queryItems;
-    return components.URL.absoluteString;
+    if (components.URL) {
+        return components.URL.absoluteString;
+    } else {
+        return nil;
+    }
 }
 
 - (void)cancelAllRequest {
-    @synchronized (self) {
+    ALLOCK(
         [self.requestDictionary enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull key, ALNetworkRequest * _Nonnull obj, BOOL * _Nonnull stop) {
             [obj.req_requestTask cancel];
         }];
-    }
+    )
 }
 
 - (void)cancelRequestWithName:(NSString *)name {
     // 移除请求
-    @synchronized (self) {
+    ALLOCK(
         if ([self.requestDictionary.allKeys containsObject:name]) {
             ALNetworkRequest *request = [self.requestDictionary objectForKey:name];
             if (request.req_requestTask) {
@@ -236,7 +260,7 @@
         if ([self.requestTimeDictionary.allKeys containsObject:name]) {
             [self.requestTimeDictionary removeObjectForKey:name];
         }
-    }
+    )
 }
 
 
@@ -258,6 +282,13 @@
 - (AFNetworkReachabilityStatus)networkStatus
 {
     return [ALAPIClient sharedInstance].networkStatus;
+}
+
+- (NSRecursiveLock *)lock {
+    if (!_lock) {
+        _lock = [[NSRecursiveLock alloc] init];
+    }
+    return _lock;
 }
 
 - (void)dealloc

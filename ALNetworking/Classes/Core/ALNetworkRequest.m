@@ -144,17 +144,16 @@
 
 - (ALNetworkRequest * (^)(NSDictionary *header))header {
     return ^ALNetworkRequest *(NSDictionary *header) {
-        self.req_inputHeader = header;
-        [self.req_header setValuesForKeysWithDictionary:header];
+        self.req_inputHeader = [header copy];
+        [self.req_header addEntriesFromDictionary:[header copy]] ;
         return self;
     };
 }
 
 - (ALNetworkRequest * (^)(NSDictionary *params))params {
     return ^ALNetworkRequest *(NSDictionary *params) {
-        self.req_inputParams = params;
-        NSMutableDictionary *reqParams = [NSMutableDictionary dictionaryWithDictionary:params];
-        [self.req_params setValuesForKeysWithDictionary:reqParams];
+        self.req_inputParams = [params copy];
+        [self.req_params addEntriesFromDictionary:[params copy]];
         return self;
     };
 }

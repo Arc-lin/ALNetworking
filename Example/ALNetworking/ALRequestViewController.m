@@ -42,6 +42,8 @@
     if (!_networking) {
         _networking = [[ALNetworking alloc] init];
         _networking.prefixUrl = @"https://v2.alapi.cn/api";
+        _networking.configParamsMethod = ALNetworkingCommonParamsMethodQS;
+        _networking.defaultParamsMethod = ALNetworkingCommonParamsMethodQS;
         _networking.defaultHeader = @{
             @"test_private_header" : @"private_header",
 //            @"priority_header" : @"privateHeader"
@@ -92,11 +94,13 @@
         };
         _networking.ignoreDefaultHeader = YES;
         _networking.ignoreDefaultParams = YES;
-        _networking.configParamsMethod = ALNetworkingCommonParamsMethodFollowMethod;
-        _networking.defaultParamsMethod = ALNetworkingCommonParamsMethodFollowMethod;
         
     }
     return _networking;
+}
+
+- (void)dealloc {
+    [self.networking cancelAllRequest];
 }
 
 @end
