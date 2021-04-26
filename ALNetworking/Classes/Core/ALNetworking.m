@@ -134,11 +134,14 @@ block\
         ALNetworkingConfig *config = [ALNetworkingConfig defaultConfig];
         
         // 处理URL,config配置优先
-        if (self.configParamsMethod == ALNetworkingCommonParamsMethodQS) {
+        if (self.defaultParamsMethod == ALNetworkingCommonParamsMethodQS && self.configParamsMethod == ALNetworkingCommonParamsMethodQS) {
+            NSMutableDictionary *params = [[ALNetworkingConfig defaultConfig].defaultParams mutableCopy];
+            /// 覆盖掉config的
+            [params addEntriesFromDictionary:self.defaultParams];
+            request.req_urlStr = [self stringWithURLString:request.req_urlStr params:params];
+        } else if (self.configParamsMethod == ALNetworkingCommonParamsMethodQS) {
             request.req_urlStr = [self stringWithURLString:request.req_urlStr params:[ALNetworkingConfig defaultConfig].defaultParams];
-        }
-        
-        if (self.defaultParamsMethod == ALNetworkingCommonParamsMethodQS) {
+        } else if (self.defaultParamsMethod == ALNetworkingCommonParamsMethodQS) {
             request.req_urlStr = [self stringWithURLString:request.req_urlStr params:self.defaultParams];
         }
         
