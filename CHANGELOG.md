@@ -25,3 +25,11 @@ All notable changes to this project will be documented in this file.
 
 #### Update
 * Fix Bug which custom response class's some properies from super class could not receive value.
+
+## [2.0.0](https://github.com/Arc-lin/ALNetworking/releases/tag/2.0.0)(26/04/2021)
+
+#### Update
+
+* Reconsitution framework
+
+* Fix Bugs

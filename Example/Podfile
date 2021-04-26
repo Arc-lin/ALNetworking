@@ -1,0 +1,15 @@
+source 'https://github.com/CocoaPods/Specs.git'
+
+platform :ios, '9.0'
+
+target 'ALNetworking_Example' do
+  pod 'ALNetworking', :path => '../'
+  pod 'coobjc'
+  pod 'ReactiveObjC'
+  pod 'MJExtension'
+  
+  target 'ALNetworking_Tests' do
+    inherit! :search_paths
+    pod 'Kiwi'
+  end
+end
