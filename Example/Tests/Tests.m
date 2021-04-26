@@ -9,24 +9,48 @@
 @import XCTest;
 
 #import <Kiwi.h>
-#import <ALNetworkRequest.h>
+#import <ALNetworking.h>
 #import <ALNetworkCache.h>
 
 SPEC_BEGIN(Tests)
 describe(@"ALNetworking Test", ^{
     context(@"This Test is for cache strategy", ^{
-    __block ALNetworkRequest *networking;
+    __block ALNetworking *networking;
     __block NSString *page = @"2";
     __block NSString *size = @"20";
         beforeEach(^{
-            networking = [[ALNetworkRequest alloc] init];
-            networking.dynamicParamsConfig = ^NSDictionary *(ALNetworkRequest *request) {
-                return @{@"page":page,@"size":size};
+            // 初始化配置
+            // 通用、全局配置
+            ALNetworkingConfig *config = [ALNetworkingConfig defaultConfig];
+            config.defaultPrefixUrl = @"https://v2.alapi.cn";
+            config.timeoutInterval = 10;
+            config.defaultCacheStrategy = ALCacheStrategyAutomatic;
+            config.distinguishError = YES;
+            config.defaultHeader = @{
+                @"test_config_header" : @"config_header",
+                @"priority_header" : @"configHeader"
             };
-            networking.handleResponse = ^NSError *(ALNetworkResponse *response, ALNetworkRequest *request) {
-                return nil;
+            config.defaultParams = @{
+                @"test_config_params" : @"config_params",
+                @"priority_params" : @"configParams",
+            };
+            __block NSInteger headerVisitTimes = 0;
+            __block NSInteger paramsVisitTimes = 0;
+            config.dynamicHeaderConfig = ^NSDictionary *(ALNetworkRequest *request) {
+                return @{
+                    @"config_header_times" : @(headerVisitTimes++).stringValue,
+                    @"priority_header": @"configDynamicHeader",
+                };
+            };
+            config.dynamicParamsConfig = ^NSDictionary *(ALNetworkRequest *request) {
+                return @{
+                    @"config_params_times" : @(paramsVisitTimes++).stringValue,
+                    @"priority_params": @"configDynamicParams",
+                };
             };
             [[ALNetworkCache defaultManager] removeAllObjects];
+            
+            networking = [[ALNetworking alloc] init];
         });
         afterEach(^{
             networking = nil;
