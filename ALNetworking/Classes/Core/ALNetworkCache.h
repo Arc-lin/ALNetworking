@@ -34,7 +34,7 @@
 - (NSString *)keyForUrl:(NSString *)url params:(NSDictionary *)params;
 
 /**
- Get from disk cache
+ 获取缓存的数据，内存缓存优先
  
  @param url API address
  @param params Parameters

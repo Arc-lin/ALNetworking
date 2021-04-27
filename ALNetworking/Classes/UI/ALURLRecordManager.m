@@ -87,7 +87,7 @@ static ALURLRecordManager *_instance;
                 record.requestHeader = headersString;
             }
             NSMutableString *params = [NSMutableString string];
-            [request.params enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull key, id  _Nonnull obj, BOOL * _Nonnull stop) {
+            [request.req_params enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull key, id  _Nonnull obj, BOOL * _Nonnull stop) {
                 [params appendFormat:@"%@ = %@ \n",key,obj];
             }];
             record.requestParams = params;

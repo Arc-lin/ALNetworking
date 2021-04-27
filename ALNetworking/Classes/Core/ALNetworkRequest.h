@@ -18,13 +18,13 @@
 
 #pragma mark - 链式调用方法
 
-/// 请求路径
+/// 请求路径，当请求路径含有http/https的时候，会认为是独立的一个url请求，prefix url的配置将会失效。configParamsMethod和defaultParamsMethod的公参配置方式，会默认为0的方式处理。
 - (ALNetworkRequest *(^)(NSString *))url;
 
-/// 请求头部
+/// 请求头部，优先级最高
 - (ALNetworkRequest * (^)(NSDictionary *header))header;
 
-/// 请求参数
+/// 请求参数，优先级最高
 - (ALNetworkRequest * (^)(NSDictionary *params))params;
 
 /// 请求方式
@@ -105,17 +105,19 @@
 
 /**
  执行下载文件请求
+ destination 值可能为空
  */
-@property (nonatomic, copy) void(^executeDownloadRequest)(ALNetworkResponse *response,ALNetworkRequest *request, NSError *error);
+@property (nonatomic, copy) void(^executeDownloadRequest)(NSString *destination,ALNetworkRequest *request, NSError *error);
 
 
 #ifdef RAC
 
 - (RACSignal<RACTuple *> *)executeSignal;
 
-- (RACSignal *)executeUploadSignal;
+- (RACSignal<RACTuple *> *)executeUploadSignal;
 
-- (RACSignal *)executeDownloadSignal;
+/// NSString 值可能为空
+- (RACSignal<NSString *> *)executeDownloadSignal;
 
 #endif
 #pragma mark - 回调处理

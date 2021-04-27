@@ -12,6 +12,8 @@
 #import <ALNetworking.h>
 #import <ALNetworkCache.h>
 #import <ALNetworkingConfig.h>
+#import <ALAPIClient.h>
+#import <ALNetworkCache.h>
 
 SPEC_BEGIN(Tests)
 describe(@"ALNetworking", ^{
@@ -52,7 +54,6 @@ describe(@"ALNetworking", ^{
                 @"priority_params": @"configDynamicParams",
             };
         };
-        [[ALNetworkCache defaultManager] removeAllObjects];
         
         networking = [[ALNetworking alloc] init];
         networking.prefixUrl = @"https://v1.alapi.cn/api";
@@ -86,6 +87,7 @@ describe(@"ALNetworking", ^{
     
     afterAll(^{
         networking = nil;
+        [[ALNetworkCache defaultManager] removeAllObjects];
     });
     
     context(@"Header And Params", ^{
@@ -127,7 +129,7 @@ describe(@"ALNetworking", ^{
             //            [[theValue(networking.requestDictionary.allKeys.count) should] equal:theValue(0)];
         });
         
-        it(@"With Dynamic Header And Dynamic Parameters", ^{
+        xit(@"With Dynamic Header And Dynamic Parameters", ^{
             networking.ignoreDefaultHeader = NO;
             /// Config的公共参数不忽略
             networking.ignoreDefaultParams = YES;
@@ -154,7 +156,7 @@ describe(@"ALNetworking", ^{
             }];
         });
         
-        it(@"Ignore dynamic header or dynamic params in chain", ^{
+        xit(@"Ignore dynamic header or dynamic params in chain", ^{
             networking.ignoreDefaultHeader = NO;
             networking.ignoreDefaultParams = NO;
             globalReqeust = networking.request;
@@ -207,6 +209,12 @@ describe(@"ALNetworking", ^{
             config.defaultPrefixUrl = @"https://v2.alapi.cn";
         });
         
+        it(@"Invalid URL", ^{
+            networking.prefixUrl = @"xxxx";
+            globalReqeust = networking.request;
+            [[globalReqeust should] beNil];
+        });
+        
         it(@"Perfix Url", ^{
             networking.prefixUrl = @"https://v1.alapi.cn";
             globalReqeust = networking.request;
@@ -221,58 +229,212 @@ describe(@"ALNetworking", ^{
         
         it(@"Method Type Change URL", ^{
             networking.prefixUrl = nil;
-            globalReqeust = networking.request;
-            
+            networking.ignoreDefaultParams = NO;
             networking.configParamsMethod = ALNetworkingCommonParamsMethodQS;
             networking.defaultParamsMethod = ALNetworkingCommonParamsMethodQS;
-            globalReqeust.get(@"/new/wbtop");
-            [[globalReqeust.req_urlStr should] equal:@"https://v2.alapi.cn/new/wbtop?test_config_params=config_params&test_private_params=private_params"];
+            
+            globalReqeust = networking.request;
+            globalReqeust.post(@"/new/wbtop").params(@{@"innerParams":@"testInnerParams"});
+            NSURL *url = [NSURL URLWithString:globalReqeust.req_urlStr];
+            [[url.path should] equal:@"/new/wbtop"];
+            [[url.host should] equal:@"v2.alapi.cn"];
+            
+            NSMutableDictionary *parm = [[NSMutableDictionary alloc]init];
+            NSURLComponents *urlComponents = [NSURLComponents componentsWithURL:url resolvingAgainstBaseURL:NO];
+            [urlComponents.queryItems enumerateObjectsUsingBlock:^(NSURLQueryItem * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+                [parm setObject:obj.value forKey:obj.name];
+            }];
+            [[parm should] equal:@{
+                @"test_config_params":@"config_params",
+                @"test_private_params":@"private_params",
+                @"priority_params" : @"privateParams",
+            }];
+            
+            [[globalReqeust.req_params should] equal:@{
+                @"innerParams":@"testInnerParams"
+            }];
         });
     });
     
     context(@"Cache", ^{
         beforeEach(^{
             ALNetworkingConfig *config = [ALNetworkingConfig defaultConfig];
-            config.defaultPrefixUrl = @"https://v2.alapi.cn";
+            config.defaultPrefixUrl = @"https://v1.alapi.cn/api";
+            networking.ignoreDefaultHeader = YES;
+            networking.ignoreDefaultParams = YES;
+            networking.defaultHeader = nil;
+            networking.defaultParams = nil;
+            networking.defaultParamsMethod = ALNetworkingCommonParamsMethodFollowMethod;
+            networking.configParamsMethod = ALNetworkingCommonParamsMethodFollowMethod;
+            
+            
+            networking.handleResponse = ^NSError *(ALNetworkResponse *response, ALNetworkRequest *request) {
+                if ([response.rawData isKindOfClass:NSDictionary.class]) {
+                    NSInteger code = [response.rawData[@"code"] integerValue];
+                    if (code != 200) {
+                        return [NSError errorWithDomain:@"domain" code:code userInfo:@{
+                            NSLocalizedDescriptionKey : [NSString stringWithFormat:@"%@",response.rawData[@"msg"]?:@""]
+                        }];
+                    } else {
+                        /// 只拿出有用的数据返回出去
+                        response.rawData = response.rawData[@"data"];
+                    }
+                }
+                return nil;
+            };
         });
         
-        it(@"Perfix Url", ^{
-            networking.prefixUrl = @"https://v1.alapi.cn";
+        xit(@"Network Only", ^{
+            __block ALNetworkResponse *resp = nil;
+            __block id result = nil;
+            
+            globalReqeust = networking.request;
+            globalReqeust.get(@"/new/wbtop").params(@{@"num" : @"3"})
+            .disableDynamicHeader(ALNetworkingConfigTypeAll)
+            .disableDynamicParams(ALNetworkingConfigTypeAll)
+            .executeRequest = ^(ALNetworkResponse *response, ALNetworkRequest *request, NSError *error) {
+                if (!error) {
+                    resp = response;
+                    result = response.rawData;
+                }
+            };
+            // 等待10秒等请求回来
+            [[expectFutureValue(result) shouldEventuallyBeforeTimingOutAfter(10)] beNonNil];
+            [[expectFutureValue(result) shouldEventuallyBeforeTimingOutAfter(10)] beKindOfClass:NSArray.class];
+            [[expectFutureValue(theValue([result count])) shouldEventually] beLessThanOrEqualTo:theValue(3)];
+            [[expectFutureValue(theValue(resp.isCache)) shouldEventuallyBeforeTimingOutAfter(10)] beNo];
+            /// 讲道理应该没缓存
+            [[expectFutureValue([[ALNetworkCache defaultManager] responseForRequestUrl:globalReqeust.req_urlStr params:globalReqeust.req_params]) shouldEventuallyBeforeTimingOutAfter(10)] beNil];
+        });
+        
+        xit(@"Cache Only At First Time", ^{
+            __block ALNetworkResponse *resp = nil;
+            __block id result = nil;
+            
             globalReqeust = networking.request;
             
-            globalReqeust.get(@"/new/wbtop");
-            [[globalReqeust.req_urlStr should] equal:@"https://v1.alapi.cn/new/wbtop"];
+            globalReqeust
+            .get(@"/new/wbtop")
+            .params(@{@"num" : @"10"})
+            .disableDynamicHeader(ALNetworkingConfigTypeAll)
+            .disableDynamicParams(ALNetworkingConfigTypeAll)
+            .cacheStrategy(ALCacheStrategyCacheOnly);
+            //            __weak typeof(globalReqeust) weakGlobalReqeust = globalReqeust;
+            globalReqeust.executeRequest = ^(ALNetworkResponse *response, ALNetworkRequest *request, NSError *error) {
+                if(!error) {
+                    resp = response;
+                    result = response.rawData;
+                    
+                    //                    weakGlobalReqeust.executeRequest = ^(ALNetworkResponse *response, ALNetworkRequest *request, NSError *error) {
+                    //                        if(!error) {
+                    //                            resp = response;
+                    //                            result = response.rawData;
+                    //                        }
+                    //                    };
+                    //
+                    //                    // 等待10秒等请求回来
+                    //                    [[expectFutureValue(theValue(resp.isCache)) shouldEventuallyBeforeTimingOutAfter(10)] beYes];
+                }
+            };
+            // 等待10秒等请求回来
+            [[expectFutureValue(theValue(resp.isCache)) shouldEventuallyBeforeTimingOutAfter(10)] beNo];
+            /// 讲道理10秒后应该有缓存
+            [[expectFutureValue([[ALNetworkCache defaultManager] responseForRequestUrl:globalReqeust.req_urlStr params:globalReqeust.req_params]) shouldEventuallyBeforeTimingOutAfter(10)] beNonNil];
+        });
+        
+        xit(@"Cache Then Network", ^{
+            __block ALNetworkResponse *resp = nil;
+            __block id result = nil;
+            /// 回调访问次数
+            __block NSInteger times = 0;
             
-            globalReqeust.get(@"https://v3.alapi.cn/new/wbtop");
-            [[globalReqeust.req_urlStr should] equal:@"https://v3.alapi.cn/new/wbtop"];
+            globalReqeust = networking.request;
             
+            globalReqeust
+            .get(@"/new/wbtop")
+            .params(@{@"num" : @"6"})
+            .disableDynamicHeader(ALNetworkingConfigTypeAll)
+            .disableDynamicParams(ALNetworkingConfigTypeAll)
+            .cacheStrategy(ALCacheStrategyCacheThenNetwork);
+            globalReqeust.executeRequest = ^(ALNetworkResponse *response, ALNetworkRequest *request, NSError *error) {
+                resp = response;
+                result = response.rawData;
+                times++;
+            };
+            [[theValue(resp.isCache) should] beYes];
+            [[resp.rawData should] beNil];
+            [[expectFutureValue(theValue(resp.isCache)) shouldEventuallyBeforeTimingOutAfter(10)] beNo];
+            [[expectFutureValue(resp.rawData) shouldEventuallyBeforeTimingOutAfter(10)] beNonNil];
+            [[expectFutureValue(theValue(times)) shouldEventuallyBeforeTimingOutAfter(10)] equal:theValue(2)];
+            /// 讲道理应该有缓存
+            [[expectFutureValue([[ALNetworkCache defaultManager] responseForRequestUrl:globalReqeust.req_urlStr params:globalReqeust.req_params]) shouldEventuallyBeforeTimingOutAfter(10)] beNonNil];
+        });
+        
+        xit(@"Cache Automatic", ^{
+            
+            __block ALNetworkResponse *resp = nil;
+            /// 回调访问次数
+            
+            globalReqeust = networking.request;
+            
+            globalReqeust
+            .get(@"/new/wbtop")
+            .params(@{@"num" : @"7"})
+            .disableDynamicHeader(ALNetworkingConfigTypeAll)
+            .disableDynamicParams(ALNetworkingConfigTypeAll)
+            .cacheStrategy(ALCacheStrategyAutomatic);
+            
+            globalReqeust.executeRequest = ^(ALNetworkResponse *response, ALNetworkRequest *request, NSError *error) {
+                resp = response;
+            };
+            
+            [[expectFutureValue(theValue([ALAPIClient sharedInstance].networkStatus)) shouldEventually] equal:theValue(AFNetworkReachabilityStatusReachableViaWiFi)];
+            
+//            [[expectFutureValue(theValue(resp.isCache)) shouldEventuallyBeforeTimingOutAfter(10)] beYes];
+            
+            [[expectFutureValue(theValue(resp.isCache)) shouldEventuallyBeforeTimingOutAfter(10)] beNo];
+            /// 讲道理应该有缓存
+            [[expectFutureValue([[ALNetworkCache defaultManager] responseForRequestUrl:globalReqeust.req_urlStr params:globalReqeust.req_params]) shouldEventuallyBeforeTimingOutAfter(10)] beNonNil];
+        });
+        
+        xit(@"Cache And Network", ^{
+            __block ALNetworkResponse *resp = nil;
+            /// 回调访问次数
+            __block NSInteger times = 0;
+            
+            globalReqeust = networking.request;
+            
+            globalReqeust
+            .get(@"/new/wbtop")
+            .params(@{@"num" : @"8"})
+            .disableDynamicHeader(ALNetworkingConfigTypeAll)
+            .disableDynamicParams(ALNetworkingConfigTypeAll)
+            .cacheStrategy(ALCacheStrategyCacheAndNetwork);
+            globalReqeust.executeRequest = ^(ALNetworkResponse *response, ALNetworkRequest *request, NSError *error) {
+                resp = response;
+                times++;
+            };
+            [[expectFutureValue(theValue(times)) shouldEventuallyBeforeTimingOutAfter(10)] equal:theValue(1)];
+            /// 讲道理应该有缓存
+            [[expectFutureValue([[ALNetworkCache defaultManager] responseForRequestUrl:globalReqeust.req_urlStr params:globalReqeust.req_params]) shouldEventuallyBeforeTimingOutAfter(10)] beNonNil];
+        });
+        
+        it(@"Memory Cache", ^{
+            __block ALNetworkResponse *resp = nil;
+            
+            globalReqeust = networking.request;
+            
+            globalReqeust
+            .get(@"/new/wbtop")
+            .params(@{@"num" : @"9"})
+            .disableDynamicHeader(ALNetworkingConfigTypeAll)
+            .disableDynamicParams(ALNetworkingConfigTypeAll)
+            .cacheStrategy(ALCacheStrategyMemoryCache);
+            globalReqeust.executeRequest = ^(ALNetworkResponse *response, ALNetworkRequest *request, NSError *error) {
+                resp = response;
+            };
+            [[expectFutureValue([[ALNetworkCache defaultManager] responseForRequestUrl:globalReqeust.req_urlStr params:globalReqeust.req_params]) shouldEventuallyBeforeTimingOutAfter(10)] beNonNil];
         });
     });
 });
 SPEC_END
-
-//
-//    networking.url(@"http://myip.ipip.net").name(@"请求2").params(@{@"test":self.page}).cacheStrategy(ALCacheStrategyCacheThenNetwork).responseType(ALNetworkResponseTypeHTTP).executeRequest = ^void(ALNetworkResponse *response, ALNetworkRequest *request, NSError *error) {
-//        XCTAssertNotNil(response.rawData,@"结果不为空");
-//    };
-//
-//    networking.get(@"http://ip.taobao.com/service/getIpInfo.php?ip=63.223.108.42").name(@"先缓存后网络并且网络不回调1").cacheStrategy(ALCacheStrategyCacheAndNetwork).executeRequest = ^(ALNetworkResponse *response, ALNetworkRequest *request, NSError *error) {
-//        XCTAssert(response.isCache == YES, @"回调是缓存类型");
-//        XCTAssertNil(response.rawData,@"第一次结果为空");
-//    };
-//
-////    sleep(2);
-//
-//    networking.get(@"http://ip.taobao.com/service/getIpInfo.php?ip=63.223.108.42").name(@"先缓存后网络并且网络不回调2").cacheStrategy(ALCacheStrategyCacheAndNetwork).executeRequest = ^(ALNetworkResponse *response, ALNetworkRequest *request, NSError *error) {
-//        XCTAssert(response.isCache == YES, @"缓存");
-//        XCTAssertNotNil(response.rawData,@"第二次结果不为空");
-//    };
-//
-//    networking.url(@"http://myip.ipip.net").name(@"请求3").params(@{@"test":self.page}).cacheStrategy(ALCacheStrategyCacheOnly).responseType(ALNetworkResponseTypeHTTP).executeRequest = ^void(ALNetworkResponse *response, ALNetworkRequest *request, NSError *error) {
-//        XCTAssert(response.isCache == YES, @"回调是缓存类型");
-//        XCTAssertNotNil(response.rawData,@"结果不为空");
-//    };
-//
-//    networking.get(@"https://tcc.taobao.com/cc/json/mobile_tel_segment.htm").name(@"请求4").params(@{@"tel":@"15919758637"}).cacheStrategy(ALCacheStrategyCacheOnly).responseType(ALNetworkResponseTypeHTTP).executeRequest = ^void(ALNetworkResponse *response, ALNetworkRequest *request, NSError *error) {
-//        XCTAssertNil(response.rawData,@"结果为空");
-//    };

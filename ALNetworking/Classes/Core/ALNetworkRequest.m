@@ -104,39 +104,35 @@
 
 - (ALNetworkRequest *(^)(NSString *))url {
     return ^ALNetworkRequest *(NSString *url) {
-        NSString *urlStr;
+        
+        url = [url copy];
         
         NSString *utf8Url = [url stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]];
         
-        if ([url hasPrefix:@"http://"] || [url hasPrefix:@"https://"]) {
+        if ([utf8Url hasPrefix:@"http://"] || [utf8Url hasPrefix:@"https://"]) {
             self.req_urlStr = utf8Url;
             return self;
         }
         
-        // 优先自己的前缀
-        NSString *prefix = self.baseUrl;
-        if (!prefix || prefix.length == 0) {
+        NSURL *URL;
+        if (self.req_urlStr.length > 0) {
+            /// 检查外部是否有把公参加到URL中
+            URL = [NSURL URLWithString:self.req_urlStr];
+        } else {
+            /// 优先自己的前缀
+            URL = [NSURL URLWithString:self.baseUrl];
+        }
+        
+        if (!URL || URL.absoluteString.length == 0) {
             self.req_urlStr = utf8Url;
             return self;
         }
         
-        // 处理重复斜杠的问题
-        NSString *removeSlash;
-        if(prefix.length > 0 && utf8Url.length > 0) {
-            NSString *lastCharInPrefix = [prefix substringFromIndex:prefix.length - 1];
-            NSString *firstCharInUrl = [utf8Url substringToIndex:1];
-            if ([lastCharInPrefix isEqualToString:@"/"] &&
-                [firstCharInUrl isEqualToString:@"/"]) {
-                removeSlash = [prefix substringToIndex:prefix.length - 1];
-            }
+        if (![[URL pathComponents] containsObject:utf8Url]) {
+            URL = [URL URLByAppendingPathComponent:utf8Url];
         }
-        if (removeSlash) {
-            prefix = removeSlash;
-        }
-        
-        urlStr = [NSString stringWithFormat:@"%@%@",prefix,utf8Url];
-        
-        self.req_urlStr = urlStr;
+       
+        self.req_urlStr = URL.absoluteString;
         
         return self;
     };
@@ -347,8 +343,13 @@
                     error = self.handleError(request, response, error);
                 }
                 [subscriber sendError:error];
+            } else {
+                if (error.code == kNoCacheErrorCode) {
+                    response.isCache = YES;
+                }
+                [subscriber sendNext:RACTuplePack(response,request)];
+                [subscriber sendCompleted];
             }
-            
         }];
         
         @weakify(request);
@@ -362,7 +363,7 @@
     return signal;
 }
 
-- (RACSignal *)executeUploadSignal {
+- (RACSignal<RACTuple *> *)executeUploadSignal {
     ALNetworkRequest *request = self;
     
     if (self.handleRequest) {
@@ -406,6 +407,10 @@
                     error = self.handleError(request,nil,error);
                 }
                 [subscriber sendError:error];
+            } else {
+                ALNetworkResponse *resp = [[ALNetworkResponse alloc] init];
+                [subscriber sendNext:RACTuplePack(resp,request)];
+                [subscriber sendCompleted];
             }
         }];
         
@@ -418,7 +423,7 @@
     return signal;
 }
 
-- (RACSignal *)executeDownloadSignal {
+- (RACSignal<NSString *> *)executeDownloadSignal {
     ALNetworkRequest *request = self;
     
     if (self.handleRequest) {
@@ -460,6 +465,9 @@
                     error = self.handleError(request, nil, error);
                 }
                 [subscriber sendError:error];
+            } else {
+                [subscriber sendNext:nil];
+                [subscriber sendCompleted];
             }
         }];
         
@@ -520,14 +528,19 @@
         }
     } failure:^(ALNetworkRequest *req, BOOL isCache,id responseObject, NSError *error) {
         ALNetworkResponse *resp = [[ALNetworkResponse alloc] init];
+        resp.rawData = responseObject;
         if ([self handleError:req response:resp isCache:isCache error:error]) {
-            resp.rawData = responseObject;
             NSError *error;
             // 处理一下错误
             if (self.handleError) {
                 error = self.handleError(req,resp,error);
             }
             executeRequest(resp,req,error);
+        } else {
+            if (error.code == kNoCacheErrorCode) {
+                resp.isCache = YES;
+            }
+            executeRequest(resp,req,nil);
         }
     }];
 }
@@ -566,7 +579,6 @@
             executeUploadRequest(response,request,nil);
         }
     } failure:^(ALNetworkRequest *request, BOOL isCache, NSError *error) {
-        
         if ([self handleError:request response:nil isCache:isCache error:error]) {
             NSError *error;
             // 处理一下错误
@@ -574,11 +586,13 @@
                 error = self.handleError(request,nil,error);
             }
             executeUploadRequest(nil,request,error);
+        } else {
+            executeUploadRequest(nil,request,nil);
         }
     }];
 }
 
-- (void)setExecuteDownloadRequest:(void (^)(ALNetworkResponse *, ALNetworkRequest *, NSError *))executeDownloadRequest {
+- (void)setExecuteDownloadRequest:(void (^)(NSString *, ALNetworkRequest *, NSError *))executeDownloadRequest {
     _executeDownloadRequest = executeDownloadRequest;
     
     if (!executeDownloadRequest) {
@@ -602,12 +616,12 @@
         if (self.handleResponse) {
             NSError *error = self.handleResponse(response,request);
             if(!error) {
-                executeDownloadRequest(response,request,nil);
+                executeDownloadRequest(response.rawData[@"path"]?:@"",request,nil);
             } else {
                 executeDownloadRequest(nil,request,error);
             }
         } else {
-            executeDownloadRequest(response,request,nil);
+            executeDownloadRequest(response.rawData[@"path"]?:@"",request,nil);
         }
     } failure:^(ALNetworkRequest *request, BOOL isCache, NSError *error) {
         if ([self handleError:request response:nil isCache:isCache error:error]) {
@@ -617,6 +631,8 @@
                 error = self.handleError(request,nil,error);
             }
             executeDownloadRequest(nil,request,error);
+        } else {
+            executeDownloadRequest(nil,request,nil);
         }
     }];
 }

@@ -45,6 +45,10 @@ block\
     /// 处理baseURL
     NSString *baseUrl = self.prefixUrl ?: [ALNetworkingConfig defaultConfig].defaultPrefixUrl;
     
+    if (baseUrl.length > 0 && ![baseUrl hasPrefix:@"http://"] && ![baseUrl hasPrefix:@"https://"]) {
+        NSLog(@"❌URL前缀不合法");
+        return nil;
+    }
     /// 处理公共请求头
     NSMutableDictionary *defaultHeader = [NSMutableDictionary dictionary];
     if (!self.ignoreDefaultHeader && [ALNetworkingConfig defaultConfig].defaultHeader) {
@@ -63,7 +67,7 @@ block\
     }
     
     /// 处理私有参数
-    if (self.defaultParams) {
+    if (self.defaultParams && self.defaultParamsMethod == ALNetworkingCommonParamsMethodFollowMethod) {
         [defaultParams addEntriesFromDictionary:self.defaultParams];
     }
     
@@ -71,6 +75,22 @@ block\
                                                             defaultHeader:defaultHeader
                                                             defaultParams:defaultParams
                                                      defaultCacheStrategy:[ALNetworkingConfig defaultConfig].defaultCacheStrategy];
+    
+    /// 处理URL
+    /// 处理URL,config配置优先
+    if (self.defaultParamsMethod == ALNetworkingCommonParamsMethodQS && self.configParamsMethod == ALNetworkingCommonParamsMethodQS) {
+        NSMutableDictionary *params = [NSMutableDictionary dictionary];
+        if (!self.ignoreDefaultParams) { /// 不忽略的情况下才加进去
+            [params addEntriesFromDictionary:[ALNetworkingConfig defaultConfig].defaultParams];
+        }
+        /// 覆盖掉config的
+        [params addEntriesFromDictionary:self.defaultParams];
+        request.req_urlStr = [self stringWithURLString:baseUrl params:params];
+    } else if (self.configParamsMethod == ALNetworkingCommonParamsMethodQS && !self.ignoreDefaultParams) {
+        request.req_urlStr = [self stringWithURLString:baseUrl params:[ALNetworkingConfig defaultConfig].defaultParams];
+    } else if (self.defaultParamsMethod == ALNetworkingCommonParamsMethodQS) {
+        request.req_urlStr = [self stringWithURLString:baseUrl params:self.defaultParams];
+    }
     
     __weak typeof(self) weakSelf = self;
     
@@ -132,18 +152,6 @@ block\
         ALNetworkRequest *requestCopy = [request copy];
         
         ALNetworkingConfig *config = [ALNetworkingConfig defaultConfig];
-        
-        // 处理URL,config配置优先
-        if (self.defaultParamsMethod == ALNetworkingCommonParamsMethodQS && self.configParamsMethod == ALNetworkingCommonParamsMethodQS) {
-            NSMutableDictionary *params = [[ALNetworkingConfig defaultConfig].defaultParams mutableCopy];
-            /// 覆盖掉config的
-            [params addEntriesFromDictionary:self.defaultParams];
-            request.req_urlStr = [self stringWithURLString:request.req_urlStr params:params];
-        } else if (self.configParamsMethod == ALNetworkingCommonParamsMethodQS) {
-            request.req_urlStr = [self stringWithURLString:request.req_urlStr params:[ALNetworkingConfig defaultConfig].defaultParams];
-        } else if (self.defaultParamsMethod == ALNetworkingCommonParamsMethodQS) {
-            request.req_urlStr = [self stringWithURLString:request.req_urlStr params:self.defaultParams];
-        }
         
         if (request.req_disableDynamicParams == ALNetworkingConfigTypeAll &&
             request.req_disableDynamicHeader == ALNetworkingConfigTypeAll) {
@@ -256,8 +264,6 @@ block\
                 [request.req_downloadTask cancel];
             }
             [self.requestDictionary removeObjectForKey:request.req_name];
-        } else {
-            NSLog(@"请求已经完成或者没有name = %@的请求",name);
         }
         
         if ([self.requestTimeDictionary.allKeys containsObject:name]) {
