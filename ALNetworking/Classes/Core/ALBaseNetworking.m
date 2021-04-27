@@ -117,7 +117,7 @@
     NSArray *methods = @[@"GET",@"POST",@"PUT",@"PATCH",@"DELETE"];
     
     NSError *serializationError = nil;
-    NSMutableURLRequest *request = [mgr.requestSerializer requestWithMethod:methods[req.req_method] URLString:req.req_urlStr parameters:req.params error:&serializationError];
+    NSMutableURLRequest *request = [mgr.requestSerializer requestWithMethod:methods[req.req_method] URLString:req.req_urlStr parameters:req.req_params error:&serializationError];
     
     if (serializationError) {
         if (failure) {

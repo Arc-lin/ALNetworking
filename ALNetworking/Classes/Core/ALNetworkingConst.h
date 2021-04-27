@@ -55,9 +55,9 @@ typedef NS_ENUM(NSInteger, ALNetworkRequestMethod) {
  */
 typedef NS_ENUM(NSInteger, ALNetworkReachabilityStatus) {
     ALNetworkReachabilityStatusUnknown          = -1,
-    ALNetworkReachabilityStatusNotReachable,
-    ALNetworkReachabilityStatusReachableViaWWAN,
-    ALNetworkReachabilityStatusReachableViaWiFi,
+    ALNetworkReachabilityStatusNotReachable     = 0,
+    ALNetworkReachabilityStatusReachableViaWWAN = 1,
+    ALNetworkReachabilityStatusReachableViaWiFi = 2,
 };
 
 /**
