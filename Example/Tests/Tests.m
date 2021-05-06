@@ -129,7 +129,7 @@ describe(@"ALNetworking", ^{
             //            [[theValue(networking.requestDictionary.allKeys.count) should] equal:theValue(0)];
         });
         
-        xit(@"With Dynamic Header And Dynamic Parameters", ^{
+        it(@"With Dynamic Header And Dynamic Parameters", ^{
             networking.ignoreDefaultHeader = NO;
             /// Config的公共参数不忽略
             networking.ignoreDefaultParams = YES;
@@ -434,6 +434,39 @@ describe(@"ALNetworking", ^{
                 resp = response;
             };
             [[expectFutureValue([[ALNetworkCache defaultManager] responseForRequestUrl:globalReqeust.req_urlStr params:globalReqeust.req_params]) shouldEventuallyBeforeTimingOutAfter(10)] beNonNil];
+        });
+    });
+    
+    context(@"Response Type", ^{
+        
+        beforeEach(^{
+            ALNetworkingConfig *config = [ALNetworkingConfig defaultConfig];
+            config.defaultPrefixUrl = @"https://www.baidu.com";
+            networking.ignoreDefaultHeader = YES;
+            networking.ignoreDefaultParams = YES;
+            networking.defaultHeader = nil;
+            networking.defaultParams = nil;
+            networking.defaultParamsMethod = ALNetworkingCommonParamsMethodFollowMethod;
+            networking.configParamsMethod = ALNetworkingCommonParamsMethodFollowMethod;
+        });
+        
+        it(@"Respoonse Type HTML", ^{
+            
+            __block NSString *result = nil;
+            
+            globalReqeust = networking.request;
+            
+            globalReqeust
+            .get(@"/s")
+            .disableDynamicHeader(ALNetworkingConfigTypeAll)
+            .disableDynamicParams(ALNetworkingConfigTypeAll)
+            .responseType(ALNetworkResponseTypeHTTP);
+            globalReqeust.executeRequest = ^(ALNetworkResponse *response, ALNetworkRequest *request, NSError *error) {
+                result = [[NSString alloc] initWithData:response.rawData encoding:4];
+                NSLog(@"result = \n%@",result);
+            };
+            [[expectFutureValue(result) shouldEventuallyBeforeTimingOutAfter(10)] containString:@"<html>"];
+            [[expectFutureValue(theValue(result.length)) shouldEventuallyBeforeTimingOutAfter(10)] beGreaterThan:theValue(0)];
         });
     });
 });
