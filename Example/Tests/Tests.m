@@ -19,7 +19,7 @@ SPEC_BEGIN(Tests)
 describe(@"ALNetworking", ^{
     
     __block ALNetworking *networking;
-    __block ALNetworkRequest *globalReqeust;
+    __block ALNetworkRequest *globalRequest;
     
     __block NSInteger headerVisitTimes_config = 0;
     __block NSInteger paramsVisitTimes_config = 0;
@@ -32,22 +32,28 @@ describe(@"ALNetworking", ^{
         ALNetworkingConfig *config = [ALNetworkingConfig defaultConfig];
         config.defaultPrefixUrl = @"https://v2.alapi.cn";
         config.timeoutInterval = 10;
+        /// 默认的缓存机制，默认不缓存
         config.defaultCacheStrategy = ALCacheStrategyNetworkOnly;
+        /// 是否要区分业务错误和网络错误，默认为true，具体内容看注释
         config.distinguishError = YES;
+        /// 全局的默认请求头
         config.defaultHeader = @{
             @"test_config_header" : @"config_header",
             @"priority_header" : @"configHeader"
         };
+        /// 全局的参数
         config.defaultParams = @{
             @"test_config_params" : @"config_params",
             @"priority_params" : @"configParams",
         };
+        /// 动态请求头，每次请求都会执行一次这个block，然后把返回值拼接到请求头中，一般用于请求加密添加Authorization参数
         config.dynamicHeaderConfig = ^NSDictionary *(ALNetworkRequest *request) {
             return @{
                 @"config_header_times" : @(++headerVisitTimes_config).stringValue,
                 @"priority_header": @"configDynamicHeader",
             };
         };
+        /// 动态请求参数，每次请求都会执行一次这个block，然后把返回值拼接到请求参数中
         config.dynamicParamsConfig = ^NSDictionary *(ALNetworkRequest *request) {
             return @{
                 @"config_params_times" : @(++paramsVisitTimes_config).stringValue,
@@ -56,31 +62,39 @@ describe(@"ALNetworking", ^{
         };
         
         networking = [[ALNetworking alloc] init];
+        /// 配置接口请求链接的前缀，优先级比ALNetworkingConfig高
         networking.prefixUrl = @"https://v1.alapi.cn/api";
-        networking.configParamsMethod = ALNetworkingCommonParamsMethodFollowMethod;
-        networking.defaultParamsMethod = ALNetworkingCommonParamsMethodFollowMethod;
+        /// 默认请求头，优先级比ALNetworkingConfig高
         networking.defaultHeader = @{
             @"test_private_header" : @"private_header",
             @"priority_header" : @"privateHeader"
         };
+        /// 默认请求参数，优先级比ALNetworkingConfig高
         networking.defaultParams = @{
             @"test_private_params" : @"private_params",
             @"priority_params" : @"privateParams"
         };
-        
+        /// 决定了ALNetworkingConfig内配置的公共参数，是否要以query string的方式拼接到接口链接上，默认为否
+        networking.configParamsMethod = ALNetworkingCommonParamsMethodFollowMethod;
+        /// 决定了networking对象配置的公共参数，是否要以query string的方式拼接到接口链接上，默认为否
+        networking.defaultParamsMethod = ALNetworkingCommonParamsMethodFollowMethod;
+        /// 动态请求头，每次请求都会执行一次这个block，然后把返回值拼接到请求头中
         networking.dynamicHeaderConfig = ^NSDictionary *(ALNetworkRequest *request) {
             return @{
                 @"private_header_times" : @(++headerVisitTimes_private).stringValue,
                 @"priority_header": @"privateDynamicHeader",
             };
         };
+        /// 动态请求参数，每次请求都会执行一次这个block，然后把返回值拼接到请求参数中
         networking.dynamicParamsConfig = ^NSDictionary *(ALNetworkRequest *request) {
             return @{
                 @"private_params_times" : @(++paramsVisitTimes_private).stringValue,
                 @"priority_params" : @"privateDynamicParams"
             };
         };
+        /// 是否要忽略ALNetworkingConfig内配置的公共请求头
         networking.ignoreDefaultHeader = NO;
+        /// 是否要忽略ALNetworkingConfig内配置的公共请求参数
         networking.ignoreDefaultParams = NO;
         
     });
@@ -96,14 +110,14 @@ describe(@"ALNetworking", ^{
         });
         
         it(@"Generate Request And Check Request", ^{
-            globalReqeust = networking.request;
-            [[globalReqeust should] beNonNil];
-            [[globalReqeust.req_header should] equal:@{
+            globalRequest = networking.request;
+            [[globalRequest should] beNonNil];
+            [[globalRequest.req_header should] equal:@{
                 @"test_config_header" : @"config_header",
                 @"test_private_header" : @"private_header",
                 @"priority_header": @"privateHeader",
             }];
-            [[globalReqeust.req_params should] equal:@{
+            [[globalRequest.req_params should] equal:@{
                 @"test_config_params" : @"config_params",
                 @"test_private_params" : @"private_params",
                 @"priority_params" : @"privateParams"
@@ -112,8 +126,8 @@ describe(@"ALNetworking", ^{
         
         it(@"Without Default Header", ^{
             networking.ignoreDefaultHeader = YES;
-            globalReqeust = networking.request;
-            [[globalReqeust.req_header should] equal:@{
+            globalRequest = networking.request;
+            [[globalRequest.req_header should] equal:@{
                 @"test_private_header" : @"private_header",
                 @"priority_header": @"privateHeader",
             }];
@@ -121,34 +135,34 @@ describe(@"ALNetworking", ^{
         
         it(@"Without Default Params", ^{
             networking.ignoreDefaultParams = YES;
-            globalReqeust = networking.request;
-            [[globalReqeust.req_params should] equal:@{
+            globalRequest = networking.request;
+            [[globalRequest.req_params should] equal:@{
                 @"test_private_params" : @"private_params",
                 @"priority_params" : @"privateParams"
             }];
             //            [[theValue(networking.requestDictionary.allKeys.count) should] equal:theValue(0)];
         });
         
-        xit(@"With Dynamic Header And Dynamic Parameters", ^{
+        it(@"With Dynamic Header And Dynamic Parameters", ^{
             networking.ignoreDefaultHeader = NO;
             /// Config的公共参数不忽略
             networking.ignoreDefaultParams = YES;
-            globalReqeust = networking.request;
-            globalReqeust
+            globalRequest = networking.request;
+            globalRequest
             .get(@"/new/wbtop")
             .header(@{@"priority_header" : @"innerHeader"})
             .params(@{@"priority_params" : @"innerParams"})
             .executeRequest = ^(ALNetworkResponse *response, ALNetworkRequest *request, NSError *error) {
                 
             };
-            [[globalReqeust.req_header should] equal:@{
+            [[globalRequest.req_header should] equal:@{
                 @"test_config_header" : @"config_header",
                 @"config_header_times" : @"1",
                 @"test_private_header" : @"private_header",
                 @"private_header_times" : @"1",
                 @"priority_header" : @"innerHeader"
             }];
-            [[globalReqeust.req_params should] equal:@{
+            [[globalRequest.req_params should] equal:@{
                 @"config_params_times" : @"1",
                 @"test_private_params" : @"private_params",
                 @"private_params_times" : @"1",
@@ -159,8 +173,8 @@ describe(@"ALNetworking", ^{
         xit(@"Ignore dynamic header or dynamic params in chain", ^{
             networking.ignoreDefaultHeader = NO;
             networking.ignoreDefaultParams = NO;
-            globalReqeust = networking.request;
-            globalReqeust
+            globalRequest = networking.request;
+            globalRequest
             .get(@"/new/wbtop")
             .header(@{@"priority_header" : @"innerHeader"})
             .params(@{@"priority_params" : @"innerParams"})
@@ -169,12 +183,12 @@ describe(@"ALNetworking", ^{
             .executeRequest = ^(ALNetworkResponse *response, ALNetworkRequest *request, NSError *error) {
                 
             };
-            [[globalReqeust.req_header should] equal:@{
+            [[globalRequest.req_header should] equal:@{
                 @"test_config_header" : @"config_header",
                 @"test_private_header" : @"private_header",
                 @"priority_header" : @"innerHeader"
             }];
-            [[globalReqeust.req_params should] equal:@{
+            [[globalRequest.req_params should] equal:@{
                 @"config_params_times" : @"2",
                 @"test_config_params" : @"config_params",
                 @"test_private_params" : @"private_params",
@@ -186,9 +200,9 @@ describe(@"ALNetworking", ^{
     context(@"Data", ^{
         
         it(@"Mock Data", ^{
-            globalReqeust = networking.request;
+            globalRequest = networking.request;
             __block ALNetworkResponse *myResp = nil;
-            globalReqeust
+            globalRequest
             .mockData(@{@"msg":@"I'm Mock Data",@"code":@200},YES)
             .get(@"/new/wbtop")
             .executeRequest = ^(ALNetworkResponse *response, ALNetworkRequest *request, NSError *error) {
@@ -211,19 +225,19 @@ describe(@"ALNetworking", ^{
         
         it(@"Invalid URL", ^{
             networking.prefixUrl = @"xxxx";
-            globalReqeust = networking.request;
-            [[globalReqeust should] beNil];
+            globalRequest = networking.request;
+            [[globalRequest should] beNil];
         });
         
         it(@"Perfix Url", ^{
             networking.prefixUrl = @"https://v1.alapi.cn";
-            globalReqeust = networking.request;
+            globalRequest = networking.request;
             
-            globalReqeust.get(@"/new/wbtop");
-            [[globalReqeust.req_urlStr should] equal:@"https://v1.alapi.cn/new/wbtop"];
+            globalRequest.get(@"/new/wbtop");
+            [[globalRequest.req_urlStr should] equal:@"https://v1.alapi.cn/new/wbtop"];
             
-            globalReqeust.get(@"https://v3.alapi.cn/new/wbtop");
-            [[globalReqeust.req_urlStr should] equal:@"https://v3.alapi.cn/new/wbtop"];
+            globalRequest.get(@"https://v3.alapi.cn/new/wbtop");
+            [[globalRequest.req_urlStr should] equal:@"https://v3.alapi.cn/new/wbtop"];
             
         });
         
@@ -233,9 +247,9 @@ describe(@"ALNetworking", ^{
             networking.configParamsMethod = ALNetworkingCommonParamsMethodQS;
             networking.defaultParamsMethod = ALNetworkingCommonParamsMethodQS;
             
-            globalReqeust = networking.request;
-            globalReqeust.post(@"/new/wbtop").params(@{@"innerParams":@"testInnerParams"});
-            NSURL *url = [NSURL URLWithString:globalReqeust.req_urlStr];
+            globalRequest = networking.request;
+            globalRequest.post(@"/new/wbtop").params(@{@"innerParams":@"testInnerParams"});
+            NSURL *url = [NSURL URLWithString:globalRequest.req_urlStr];
             [[url.path should] equal:@"/new/wbtop"];
             [[url.host should] equal:@"v2.alapi.cn"];
             
@@ -250,7 +264,7 @@ describe(@"ALNetworking", ^{
                 @"priority_params" : @"privateParams",
             }];
             
-            [[globalReqeust.req_params should] equal:@{
+            [[globalRequest.req_params should] equal:@{
                 @"innerParams":@"testInnerParams"
             }];
         });
@@ -266,8 +280,12 @@ describe(@"ALNetworking", ^{
             networking.defaultParams = nil;
             networking.defaultParamsMethod = ALNetworkingCommonParamsMethodFollowMethod;
             networking.configParamsMethod = ALNetworkingCommonParamsMethodFollowMethod;
-            
-            
+            networking.handleRequest = ^ALNetworkRequest *(ALNetworkRequest *request) {
+                return request;
+            };
+            networking.handleError = ^(ALNetworkRequest *request, ALNetworkResponse *response, NSError *error) {
+                
+            };
             networking.handleResponse = ^NSError *(ALNetworkResponse *response, ALNetworkRequest *request) {
                 if ([response.rawData isKindOfClass:NSDictionary.class]) {
                     NSInteger code = [response.rawData[@"code"] integerValue];
@@ -288,8 +306,8 @@ describe(@"ALNetworking", ^{
             __block ALNetworkResponse *resp = nil;
             __block id result = nil;
             
-            globalReqeust = networking.request;
-            globalReqeust.get(@"/new/wbtop").params(@{@"num" : @"3"})
+            globalRequest = networking.request;
+            globalRequest.get(@"/new/wbtop").params(@{@"num" : @"3"})
             .disableDynamicHeader(ALNetworkingConfigTypeAll)
             .disableDynamicParams(ALNetworkingConfigTypeAll)
             .executeRequest = ^(ALNetworkResponse *response, ALNetworkRequest *request, NSError *error) {
@@ -304,28 +322,28 @@ describe(@"ALNetworking", ^{
             [[expectFutureValue(theValue([result count])) shouldEventually] beLessThanOrEqualTo:theValue(3)];
             [[expectFutureValue(theValue(resp.isCache)) shouldEventuallyBeforeTimingOutAfter(10)] beNo];
             /// 讲道理应该没缓存
-            [[expectFutureValue([[ALNetworkCache defaultManager] responseForRequestUrl:globalReqeust.req_urlStr params:globalReqeust.req_params]) shouldEventuallyBeforeTimingOutAfter(10)] beNil];
+            [[expectFutureValue([[ALNetworkCache defaultManager] responseForRequestUrl:globalRequest.req_urlStr params:globalRequest.req_params]) shouldEventuallyBeforeTimingOutAfter(10)] beNil];
         });
         
         xit(@"Cache Only At First Time", ^{
             __block ALNetworkResponse *resp = nil;
             __block id result = nil;
             
-            globalReqeust = networking.request;
+            globalRequest = networking.request;
             
-            globalReqeust
+            globalRequest
             .get(@"/new/wbtop")
             .params(@{@"num" : @"10"})
             .disableDynamicHeader(ALNetworkingConfigTypeAll)
             .disableDynamicParams(ALNetworkingConfigTypeAll)
             .cacheStrategy(ALCacheStrategyCacheOnly);
-            //            __weak typeof(globalReqeust) weakGlobalReqeust = globalReqeust;
-            globalReqeust.executeRequest = ^(ALNetworkResponse *response, ALNetworkRequest *request, NSError *error) {
+            //            __weak typeof(globalRequest) weakglobalRequest = globalRequest;
+            globalRequest.executeRequest = ^(ALNetworkResponse *response, ALNetworkRequest *request, NSError *error) {
                 if(!error) {
                     resp = response;
                     result = response.rawData;
                     
-                    //                    weakGlobalReqeust.executeRequest = ^(ALNetworkResponse *response, ALNetworkRequest *request, NSError *error) {
+                    //                    weakglobalRequest.executeRequest = ^(ALNetworkResponse *response, ALNetworkRequest *request, NSError *error) {
                     //                        if(!error) {
                     //                            resp = response;
                     //                            result = response.rawData;
@@ -339,7 +357,7 @@ describe(@"ALNetworking", ^{
             // 等待10秒等请求回来
             [[expectFutureValue(theValue(resp.isCache)) shouldEventuallyBeforeTimingOutAfter(10)] beNo];
             /// 讲道理10秒后应该有缓存
-            [[expectFutureValue([[ALNetworkCache defaultManager] responseForRequestUrl:globalReqeust.req_urlStr params:globalReqeust.req_params]) shouldEventuallyBeforeTimingOutAfter(10)] beNonNil];
+            [[expectFutureValue([[ALNetworkCache defaultManager] responseForRequestUrl:globalRequest.req_urlStr params:globalRequest.req_params]) shouldEventuallyBeforeTimingOutAfter(10)] beNonNil];
         });
         
         xit(@"Cache Then Network", ^{
@@ -348,15 +366,15 @@ describe(@"ALNetworking", ^{
             /// 回调访问次数
             __block NSInteger times = 0;
             
-            globalReqeust = networking.request;
+            globalRequest = networking.request;
             
-            globalReqeust
+            globalRequest
             .get(@"/new/wbtop")
             .params(@{@"num" : @"6"})
             .disableDynamicHeader(ALNetworkingConfigTypeAll)
             .disableDynamicParams(ALNetworkingConfigTypeAll)
             .cacheStrategy(ALCacheStrategyCacheThenNetwork);
-            globalReqeust.executeRequest = ^(ALNetworkResponse *response, ALNetworkRequest *request, NSError *error) {
+            globalRequest.executeRequest = ^(ALNetworkResponse *response, ALNetworkRequest *request, NSError *error) {
                 resp = response;
                 result = response.rawData;
                 times++;
@@ -367,7 +385,7 @@ describe(@"ALNetworking", ^{
             [[expectFutureValue(resp.rawData) shouldEventuallyBeforeTimingOutAfter(10)] beNonNil];
             [[expectFutureValue(theValue(times)) shouldEventuallyBeforeTimingOutAfter(10)] equal:theValue(2)];
             /// 讲道理应该有缓存
-            [[expectFutureValue([[ALNetworkCache defaultManager] responseForRequestUrl:globalReqeust.req_urlStr params:globalReqeust.req_params]) shouldEventuallyBeforeTimingOutAfter(10)] beNonNil];
+            [[expectFutureValue([[ALNetworkCache defaultManager] responseForRequestUrl:globalRequest.req_urlStr params:globalRequest.req_params]) shouldEventuallyBeforeTimingOutAfter(10)] beNonNil];
         });
         
         xit(@"Cache Automatic", ^{
@@ -375,16 +393,16 @@ describe(@"ALNetworking", ^{
             __block ALNetworkResponse *resp = nil;
             /// 回调访问次数
             
-            globalReqeust = networking.request;
+            globalRequest = networking.request;
             
-            globalReqeust
+            globalRequest
             .get(@"/new/wbtop")
             .params(@{@"num" : @"7"})
             .disableDynamicHeader(ALNetworkingConfigTypeAll)
             .disableDynamicParams(ALNetworkingConfigTypeAll)
             .cacheStrategy(ALCacheStrategyAutomatic);
             
-            globalReqeust.executeRequest = ^(ALNetworkResponse *response, ALNetworkRequest *request, NSError *error) {
+            globalRequest.executeRequest = ^(ALNetworkResponse *response, ALNetworkRequest *request, NSError *error) {
                 resp = response;
             };
             
@@ -394,7 +412,7 @@ describe(@"ALNetworking", ^{
             
             [[expectFutureValue(theValue(resp.isCache)) shouldEventuallyBeforeTimingOutAfter(10)] beNo];
             /// 讲道理应该有缓存
-            [[expectFutureValue([[ALNetworkCache defaultManager] responseForRequestUrl:globalReqeust.req_urlStr params:globalReqeust.req_params]) shouldEventuallyBeforeTimingOutAfter(10)] beNonNil];
+            [[expectFutureValue([[ALNetworkCache defaultManager] responseForRequestUrl:globalRequest.req_urlStr params:globalRequest.req_params]) shouldEventuallyBeforeTimingOutAfter(10)] beNonNil];
         });
         
         xit(@"Cache And Network", ^{
@@ -402,39 +420,177 @@ describe(@"ALNetworking", ^{
             /// 回调访问次数
             __block NSInteger times = 0;
             
-            globalReqeust = networking.request;
+            globalRequest = networking.request;
             
-            globalReqeust
+            globalRequest
             .get(@"/new/wbtop")
             .params(@{@"num" : @"8"})
             .disableDynamicHeader(ALNetworkingConfigTypeAll)
             .disableDynamicParams(ALNetworkingConfigTypeAll)
             .cacheStrategy(ALCacheStrategyCacheAndNetwork);
-            globalReqeust.executeRequest = ^(ALNetworkResponse *response, ALNetworkRequest *request, NSError *error) {
+            globalRequest.executeRequest = ^(ALNetworkResponse *response, ALNetworkRequest *request, NSError *error) {
                 resp = response;
                 times++;
             };
             [[expectFutureValue(theValue(times)) shouldEventuallyBeforeTimingOutAfter(10)] equal:theValue(1)];
             /// 讲道理应该有缓存
-            [[expectFutureValue([[ALNetworkCache defaultManager] responseForRequestUrl:globalReqeust.req_urlStr params:globalReqeust.req_params]) shouldEventuallyBeforeTimingOutAfter(10)] beNonNil];
+            [[expectFutureValue([[ALNetworkCache defaultManager] responseForRequestUrl:globalRequest.req_urlStr params:globalRequest.req_params]) shouldEventuallyBeforeTimingOutAfter(10)] beNonNil];
         });
         
-        it(@"Memory Cache", ^{
+        xit(@"Memory Cache", ^{
             __block ALNetworkResponse *resp = nil;
             
-            globalReqeust = networking.request;
+            globalRequest = networking.request;
             
-            globalReqeust
+            globalRequest
             .get(@"/new/wbtop")
             .params(@{@"num" : @"9"})
             .disableDynamicHeader(ALNetworkingConfigTypeAll)
             .disableDynamicParams(ALNetworkingConfigTypeAll)
             .cacheStrategy(ALCacheStrategyMemoryCache);
-            globalReqeust.executeRequest = ^(ALNetworkResponse *response, ALNetworkRequest *request, NSError *error) {
+            globalRequest.executeRequest = ^(ALNetworkResponse *response, ALNetworkRequest *request, NSError *error) {
                 resp = response;
             };
-            [[expectFutureValue([[ALNetworkCache defaultManager] responseForRequestUrl:globalReqeust.req_urlStr params:globalReqeust.req_params]) shouldEventuallyBeforeTimingOutAfter(10)] beNonNil];
+            [[expectFutureValue([[ALNetworkCache defaultManager] responseForRequestUrl:globalRequest.req_urlStr params:globalRequest.req_params]) shouldEventuallyBeforeTimingOutAfter(10)] beNonNil];
         });
     });
+    
+    context(@"Response Type", ^{
+        
+        beforeEach(^{
+            ALNetworkingConfig *config = [ALNetworkingConfig defaultConfig];
+            config.defaultPrefixUrl = @"https://www.baidu.com";
+            networking.ignoreDefaultHeader = YES;
+            networking.ignoreDefaultParams = YES;
+            networking.defaultHeader = nil;
+            networking.defaultParams = nil;
+            networking.defaultParamsMethod = ALNetworkingCommonParamsMethodFollowMethod;
+            networking.configParamsMethod = ALNetworkingCommonParamsMethodFollowMethod;
+        });
+        
+        xit(@"Respoonse Type HTML", ^{
+            
+            __block NSString *result = nil;
+            
+            globalRequest = networking.request;
+            
+            globalRequest
+            .get(@"/s")
+            .disableDynamicHeader(ALNetworkingConfigTypeAll)
+            .disableDynamicParams(ALNetworkingConfigTypeAll)
+            .responseType(ALNetworkResponseTypeHTTP);
+            globalRequest.executeRequest = ^(ALNetworkResponse *response, ALNetworkRequest *request, NSError *error) {
+                result = [[NSString alloc] initWithData:response.rawData encoding:4];
+                NSLog(@"result = \n%@",result);
+            };
+            [[expectFutureValue(result) shouldEventuallyBeforeTimingOutAfter(10)] beKindOfClass:NSString.class];
+            [[expectFutureValue(result) shouldEventuallyBeforeTimingOutAfter(10)] containString:@"<html>"];
+            [[expectFutureValue(theValue(result.length)) shouldEventuallyBeforeTimingOutAfter(10)] beGreaterThan:theValue(0)];
+        });
+        
+        xit(@"Response Type Image", ^{
+            __block id result = nil;
+            
+            globalRequest = networking.request;
+            
+            globalRequest
+            .get(@"https://www.baidu.com/img/PCtm_d9c8750bed0b3c7d089fa7d55720d6cf.png")
+            .responseType(ALNetworkResponseTypeImage)
+            .executeRequest = ^(ALNetworkResponse *response, ALNetworkRequest *request, NSError *error) {
+                result = response.rawData;
+            };
+            [[expectFutureValue(result) shouldEventuallyBeforeTimingOutAfter(10)] beKindOfClass:UIImage.class];
+        });
+    });
+    
+    context(@"Upload", ^{
+        xit(@"Upload Image", ^{
+            __block id result = nil;
+            __block id imageUrl = nil;
+            NSString *fileName = [NSUUID UUID].UUIDString;
+            NSData *data = UIImagePNGRepresentation([UIImage imageNamed:@"40icon_friends"]);
+            globalRequest = networking.request;
+            globalRequest
+            .post(@"https://sm.ms/api/v2/upload")
+            .header(@{@"Authorization" : @"申请个key"})
+            .params(@{@"format":@"json"})
+            .fileFieldName(@"smfile")
+            .uploadData(data,fileName,@"image/png")
+            .executeUploadRequest = ^(ALNetworkResponse *response, ALNetworkRequest *request, NSError *error) {
+                NSDictionary *dic = [NSJSONSerialization JSONObjectWithData:response.rawData options:NSJSONReadingMutableContainers error:nil];
+                result = dic[@"code"];
+                imageUrl = dic[@"url"];
+                NSLog(@"%@",imageUrl);
+            };
+            [[expectFutureValue(result) shouldEventuallyBeforeTimingOutAfter(10)] equal:@"image_repeated"];
+            [[expectFutureValue(imageUrl) shouldEventuallyBeforeTimingOutAfter(10)] beNonNil];
+        });
+        
+        xit(@"Cancel Upload", ^{
+            __block id result = nil;
+            NSString *fileName = [NSUUID UUID].UUIDString;
+            NSData *data = UIImagePNGRepresentation([UIImage imageNamed:@"40icon_friends"]);
+            globalRequest = networking.request;
+            globalRequest
+            .post(@"https://sm.ms/api/v2/upload")
+            .header(@{@"Authorization" : @"申请个key"})
+            .params(@{@"format":@"json"})
+            .fileFieldName(@"smfile")
+            .uploadData(data,fileName,@"image/png")
+            .executeUploadRequest = ^(ALNetworkResponse *response, ALNetworkRequest *request, NSError *error) {
+                if (response) {
+                    NSDictionary *dic = [NSJSONSerialization JSONObjectWithData:response.rawData options:NSJSONReadingMutableContainers error:nil];
+                    result = dic[@"code"];
+                }
+            };
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                [networking cancelAllRequest];
+            });
+            [[expectFutureValue(result) shouldEventuallyBeforeTimingOutAfter(10)] beNil];
+        });
+        
+    });
+    
+    context(@"Download", ^{
+        
+        xit(@"Download", ^{
+            __block id result = nil;
+            NSString *filePath = [[NSString alloc] initWithString:NSHomeDirectory()];
+            filePath = [filePath stringByAppendingPathComponent:@"Documents"];
+            globalRequest = networking.request;
+            globalRequest
+            .downloadDestPath(filePath)
+            .responseType(ALNetworkResponseTypeImage)
+            .get(@"https://images.pexels.com/photos/2179064/pexels-photo-2179064.jpeg?cs=srgb&dl=pexels-darwis-alwan-2179064.jpg&fm=jpg")
+            .executeDownloadRequest = ^(NSString *destination, ALNetworkRequest *request, NSError *error) {
+                result = destination;
+                NSLog(@"Path --- %@",result);
+            };
+            [[expectFutureValue(theValue([[NSFileManager defaultManager] fileExistsAtPath:result])) shouldEventuallyBeforeTimingOutAfter(10)] beYes];
+        });
+        
+        xit(@"Cancel Download", ^{
+            __block id result = nil;
+            NSString *filePath = [[NSString alloc] initWithString:NSHomeDirectory()];
+            filePath = [filePath stringByAppendingPathComponent:@"Documents"];
+            globalRequest = networking.request;
+            globalRequest
+            .downloadDestPath(filePath)
+            .responseType(ALNetworkResponseTypeImage)
+            .get(@"https://images.pexels.com/photos/2179064/pexels-photo-2179064.jpeg?cs=srgb&dl=pexels-darwis-alwan-2179064.jpg&fm=jpg")
+            .executeDownloadRequest = ^(NSString *destination, ALNetworkRequest *request, NSError *error) {
+                result = destination;
+                NSLog(@"Path --- %@",result);
+            };
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                [networking cancelAllRequest];
+            });
+            [[expectFutureValue(theValue([[NSFileManager defaultManager] fileExistsAtPath:result])) shouldEventuallyBeforeTimingOutAfter(10)] beNo];
+        });
+        
+    });
+    
+    
+    
 });
 SPEC_END

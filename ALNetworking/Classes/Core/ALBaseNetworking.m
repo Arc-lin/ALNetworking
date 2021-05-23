@@ -163,7 +163,7 @@
     
     [self configWithRequest:req manager:mgr setTimeOut:NO];
     
-    NSURLSessionDataTask *task = [mgr POST:req.req_urlStr parameters:req.req_params headers:nil constructingBodyWithBlock:^(id<AFMultipartFormData>  _Nonnull formData) {
+    NSURLSessionDataTask *task = [mgr POST:req.req_urlStr parameters:req.req_params headers:req.req_header constructingBodyWithBlock:^(id<AFMultipartFormData>  _Nonnull formData) {
         if (req.req_data && req.req_data.count > 0) {
             NSInteger index = 0;
             for (NSData *data in req.req_data) {
