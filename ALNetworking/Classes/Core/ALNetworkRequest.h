@@ -82,12 +82,12 @@
 #pragma mark - 拦截处理
 
 /**
- 请求前拦截请求体处理 如果需要取消请求则返回空值
+ 请求前拦截请求体处理 如果需要取消请求则返回空值，请不要覆盖这个值
  */
 @property (nonatomic, copy) ALNetworkRequest *(^handleRequest)(ALNetworkRequest *request);
 
 /**
- 根据需求处理回调信息判断是否是正确的业务返回结果
+ 根据需求处理回调信息判断是否是正确的业务返回结果，请不要覆盖这个值
  */
 @property (nonatomic, copy) NSError *(^handleResponse)(ALNetworkResponse *response,ALNetworkRequest *request);
 

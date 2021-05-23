@@ -32,22 +32,28 @@ describe(@"ALNetworking", ^{
         ALNetworkingConfig *config = [ALNetworkingConfig defaultConfig];
         config.defaultPrefixUrl = @"https://v2.alapi.cn";
         config.timeoutInterval = 10;
+        /// 默认的缓存机制，默认不缓存
         config.defaultCacheStrategy = ALCacheStrategyNetworkOnly;
+        /// 是否要区分业务错误和网络错误，默认为true，具体内容看注释
         config.distinguishError = YES;
+        /// 全局的默认请求头
         config.defaultHeader = @{
             @"test_config_header" : @"config_header",
             @"priority_header" : @"configHeader"
         };
+        /// 全局的参数
         config.defaultParams = @{
             @"test_config_params" : @"config_params",
             @"priority_params" : @"configParams",
         };
+        /// 动态请求头，每次请求都会执行一次这个block，然后把返回值拼接到请求头中，一般用于请求加密添加Authorization参数
         config.dynamicHeaderConfig = ^NSDictionary *(ALNetworkRequest *request) {
             return @{
                 @"config_header_times" : @(++headerVisitTimes_config).stringValue,
                 @"priority_header": @"configDynamicHeader",
             };
         };
+        /// 动态请求参数，每次请求都会执行一次这个block，然后把返回值拼接到请求参数中
         config.dynamicParamsConfig = ^NSDictionary *(ALNetworkRequest *request) {
             return @{
                 @"config_params_times" : @(++paramsVisitTimes_config).stringValue,
@@ -56,31 +62,39 @@ describe(@"ALNetworking", ^{
         };
         
         networking = [[ALNetworking alloc] init];
+        /// 配置接口请求链接的前缀，优先级比ALNetworkingConfig高
         networking.prefixUrl = @"https://v1.alapi.cn/api";
-        networking.configParamsMethod = ALNetworkingCommonParamsMethodFollowMethod;
-        networking.defaultParamsMethod = ALNetworkingCommonParamsMethodFollowMethod;
+        /// 默认请求头，优先级比ALNetworkingConfig高
         networking.defaultHeader = @{
             @"test_private_header" : @"private_header",
             @"priority_header" : @"privateHeader"
         };
+        /// 默认请求参数，优先级比ALNetworkingConfig高
         networking.defaultParams = @{
             @"test_private_params" : @"private_params",
             @"priority_params" : @"privateParams"
         };
-        
+        /// 决定了ALNetworkingConfig内配置的公共参数，是否要以query string的方式拼接到接口链接上，默认为否
+        networking.configParamsMethod = ALNetworkingCommonParamsMethodFollowMethod;
+        /// 决定了networking对象配置的公共参数，是否要以query string的方式拼接到接口链接上，默认为否
+        networking.defaultParamsMethod = ALNetworkingCommonParamsMethodFollowMethod;
+        /// 动态请求头，每次请求都会执行一次这个block，然后把返回值拼接到请求头中
         networking.dynamicHeaderConfig = ^NSDictionary *(ALNetworkRequest *request) {
             return @{
                 @"private_header_times" : @(++headerVisitTimes_private).stringValue,
                 @"priority_header": @"privateDynamicHeader",
             };
         };
+        /// 动态请求参数，每次请求都会执行一次这个block，然后把返回值拼接到请求参数中
         networking.dynamicParamsConfig = ^NSDictionary *(ALNetworkRequest *request) {
             return @{
                 @"private_params_times" : @(++paramsVisitTimes_private).stringValue,
                 @"priority_params" : @"privateDynamicParams"
             };
         };
+        /// 是否要忽略ALNetworkingConfig内配置的公共请求头
         networking.ignoreDefaultHeader = NO;
+        /// 是否要忽略ALNetworkingConfig内配置的公共请求参数
         networking.ignoreDefaultParams = NO;
         
     });
@@ -266,8 +280,12 @@ describe(@"ALNetworking", ^{
             networking.defaultParams = nil;
             networking.defaultParamsMethod = ALNetworkingCommonParamsMethodFollowMethod;
             networking.configParamsMethod = ALNetworkingCommonParamsMethodFollowMethod;
-            
-            
+            networking.handleRequest = ^ALNetworkRequest *(ALNetworkRequest *request) {
+                return request;
+            };
+            networking.handleError = ^(ALNetworkRequest *request, ALNetworkResponse *response, NSError *error) {
+                
+            };
             networking.handleResponse = ^NSError *(ALNetworkResponse *response, ALNetworkRequest *request) {
                 if ([response.rawData isKindOfClass:NSDictionary.class]) {
                     NSInteger code = [response.rawData[@"code"] integerValue];
@@ -450,7 +468,7 @@ describe(@"ALNetworking", ^{
             networking.configParamsMethod = ALNetworkingCommonParamsMethodFollowMethod;
         });
         
-        it(@"Respoonse Type HTML", ^{
+        xit(@"Respoonse Type HTML", ^{
             
             __block NSString *result = nil;
             
@@ -494,7 +512,7 @@ describe(@"ALNetworking", ^{
             globalRequest = networking.request;
             globalRequest
             .post(@"https://sm.ms/api/v2/upload")
-            .header(@{@"Authorization" : @"VysqCxjAkVX62PT7Sfy1PHKYYWzmaAnd"})
+            .header(@{@"Authorization" : @"申请个key"})
             .params(@{@"format":@"json"})
             .fileFieldName(@"smfile")
             .uploadData(data,fileName,@"image/png")
@@ -508,14 +526,14 @@ describe(@"ALNetworking", ^{
             [[expectFutureValue(imageUrl) shouldEventuallyBeforeTimingOutAfter(10)] beNonNil];
         });
         
-        it(@"Cancel Upload", ^{
+        xit(@"Cancel Upload", ^{
             __block id result = nil;
             NSString *fileName = [NSUUID UUID].UUIDString;
             NSData *data = UIImagePNGRepresentation([UIImage imageNamed:@"40icon_friends"]);
             globalRequest = networking.request;
             globalRequest
             .post(@"https://sm.ms/api/v2/upload")
-            .header(@{@"Authorization" : @"VysqCxjAkVX62PT7Sfy1PHKYYWzmaAnd"})
+            .header(@{@"Authorization" : @"申请个key"})
             .params(@{@"format":@"json"})
             .fileFieldName(@"smfile")
             .uploadData(data,fileName,@"image/png")
@@ -530,6 +548,49 @@ describe(@"ALNetworking", ^{
             });
             [[expectFutureValue(result) shouldEventuallyBeforeTimingOutAfter(10)] beNil];
         });
+        
     });
+    
+    context(@"Download", ^{
+        
+        xit(@"Download", ^{
+            __block id result = nil;
+            NSString *filePath = [[NSString alloc] initWithString:NSHomeDirectory()];
+            filePath = [filePath stringByAppendingPathComponent:@"Documents"];
+            globalRequest = networking.request;
+            globalRequest
+            .downloadDestPath(filePath)
+            .responseType(ALNetworkResponseTypeImage)
+            .get(@"https://images.pexels.com/photos/2179064/pexels-photo-2179064.jpeg?cs=srgb&dl=pexels-darwis-alwan-2179064.jpg&fm=jpg")
+            .executeDownloadRequest = ^(NSString *destination, ALNetworkRequest *request, NSError *error) {
+                result = destination;
+                NSLog(@"Path --- %@",result);
+            };
+            [[expectFutureValue(theValue([[NSFileManager defaultManager] fileExistsAtPath:result])) shouldEventuallyBeforeTimingOutAfter(10)] beYes];
+        });
+        
+        xit(@"Cancel Download", ^{
+            __block id result = nil;
+            NSString *filePath = [[NSString alloc] initWithString:NSHomeDirectory()];
+            filePath = [filePath stringByAppendingPathComponent:@"Documents"];
+            globalRequest = networking.request;
+            globalRequest
+            .downloadDestPath(filePath)
+            .responseType(ALNetworkResponseTypeImage)
+            .get(@"https://images.pexels.com/photos/2179064/pexels-photo-2179064.jpeg?cs=srgb&dl=pexels-darwis-alwan-2179064.jpg&fm=jpg")
+            .executeDownloadRequest = ^(NSString *destination, ALNetworkRequest *request, NSError *error) {
+                result = destination;
+                NSLog(@"Path --- %@",result);
+            };
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                [networking cancelAllRequest];
+            });
+            [[expectFutureValue(theValue([[NSFileManager defaultManager] fileExistsAtPath:result])) shouldEventuallyBeforeTimingOutAfter(10)] beNo];
+        });
+        
+    });
+    
+    
+    
 });
 SPEC_END
