@@ -125,61 +125,61 @@ pod 'ALNetworking/Recorder'
 	
 	```
 	ALNetworking *networking = [[ALNetworking alloc] init];
-   /// 配置接口请求链接的前缀，优先级比ALNetworkingConfig高
-   networking.prefixUrl = @"https://v1.alapi.cn/api";
-   /// 默认请求头，优先级比ALNetworkingConfig高
-   networking.defaultHeader = @{};
-   /// 默认请求参数，优先级比ALNetworkingConfig高
-   networking.defaultParams = @{};
-   /// 决定了ALNetworkingConfig内配置的公共参数，是否要以query string的方式拼接到接口链接上，默认为否
-   networking.configParamsMethod = ALNetworkingCommonParamsMethodFollowMethod;
-   /// 决定了networking对象配置的公共参数，是否要以query string的方式拼接到接口链接上，默认为否
-   networking.defaultParamsMethod = ALNetworkingCommonParamsMethodFollowMethod;
-   /// 动态请求头，每次请求都会执行一次这个block，然后把返回值拼接到请求头中
-   networking.dynamicHeaderConfig = ^NSDictionary *(ALNetworkRequest *request) {
-        return @{};
-    };
-  /// 动态请求参数，每次请求都会执行一次这个block，然后把返回值拼接到请求参数中
-  networking.dynamicParamsConfig = ^NSDictionary *(ALNetworkRequest *request) {
-        return @{};
-   };
-  /// 是否要忽略ALNetworkingConfig内配置的公共请求头
-  networking.ignoreDefaultHeader = NO;
-  /// 是否要忽略ALNetworkingConfig内配置的公共请求参数
-  networking.ignoreDefaultParams = NO; 
-  /// 处理响应，一般用来判断业务逻辑，这里假设业务接口返回的数据结构为{"code":200,"msg":"","data":{}} 
-  networking.handleResponse = ^NSError *(ALNetworkResponse *response, ALNetworkRequest *request) {
-	   if ([response.rawData isKindOfClass:NSDictionary.class]) {
-		     /// 简单判断一下业务返回200的时候才是正确的情况
-	        NSInteger code = [response.rawData[@"code"] integerValue];
-	        if (code != 200) {
-	            return [NSError errorWithDomain:@"domain" code:code userInfo:@{
-	                NSLocalizedDescriptionKey : [NSString stringWithFormat:@"%@",response.rawData[@"msg"]?:@""]
-	            }];
-	        } else {
-	            /// 只拿出有用的数据返回出去
-	            response.rawData = response.rawData[@"data"];
-	        }
-	    }
-	    /// 返回nil表示正常，返回NSError认为是业务错误
-	    return nil;
-   };
-   /// 在请求之前拦截一下请求体
-   networking.handleRequest = ^ALNetworkRequest *(ALNetworkRequest *request) {
-         return request; // 如果返回nil的话，则不执行请求
-	};
-	/// 发生链路上的错误，比如404、403等，也有可能是500等服务器的错误
-	networking.handleError = ^(ALNetworkRequest *request, ALNetworkResponse *response, NSError *error) {
-	    
-	};
+	   /// 配置接口请求链接的前缀，优先级比ALNetworkingConfig高
+	   networking.prefixUrl = @"https://v1.alapi.cn/api";
+	   /// 默认请求头，优先级比ALNetworkingConfig高
+	   networking.defaultHeader = @{};
+	   /// 默认请求参数，优先级比ALNetworkingConfig高
+	   networking.defaultParams = @{};
+	   /// 决定了ALNetworkingConfig内配置的公共参数，是否要以query string的方式拼接到接口链接上，默认为否
+	   networking.configParamsMethod = ALNetworkingCommonParamsMethodFollowMethod;
+	   /// 决定了networking对象配置的公共参数，是否要以query string的方式拼接到接口链接上，默认为否
+	   networking.defaultParamsMethod = ALNetworkingCommonParamsMethodFollowMethod;
+	   /// 动态请求头，每次请求都会执行一次这个block，然后把返回值拼接到请求头中
+	   networking.dynamicHeaderConfig = ^NSDictionary *(ALNetworkRequest *request) {
+		return @{};
+	    };
+	  /// 动态请求参数，每次请求都会执行一次这个block，然后把返回值拼接到请求参数中
+	  networking.dynamicParamsConfig = ^NSDictionary *(ALNetworkRequest *request) {
+		return @{};
+	   };
+	  /// 是否要忽略ALNetworkingConfig内配置的公共请求头
+	  networking.ignoreDefaultHeader = NO;
+	  /// 是否要忽略ALNetworkingConfig内配置的公共请求参数
+	  networking.ignoreDefaultParams = NO; 
+	  /// 处理响应，一般用来判断业务逻辑，这里假设业务接口返回的数据结构为{"code":200,"msg":"","data":{}} 
+	  networking.handleResponse = ^NSError *(ALNetworkResponse *response, ALNetworkRequest *request) {
+		   if ([response.rawData isKindOfClass:NSDictionary.class]) {
+			/// 简单判断一下业务返回200的时候才是正确的情况
+			NSInteger code = [response.rawData[@"code"] integerValue];
+			if (code != 200) {
+			    return [NSError errorWithDomain:@"domain" code:code userInfo:@{
+				NSLocalizedDescriptionKey : [NSString stringWithFormat:@"%@",response.rawData[@"msg"]?:@""]
+			    }];
+			} else {
+			    /// 只拿出有用的数据返回出去
+			    response.rawData = response.rawData[@"data"];
+			}
+		    }
+		    /// 返回nil表示正常，返回NSError认为是业务错误
+		    return nil;
+	   };
+	   /// 在请求之前拦截一下请求体
+	   networking.handleRequest = ^ALNetworkRequest *(ALNetworkRequest *request) {
+	   	return request; // 如果返回nil的话，则不执行请求
+	   };
+	   /// 发生链路上的错误，比如404、403等，也有可能是500等服务器的错误
+	   networking.handleError = ^(ALNetworkRequest *request, ALNetworkResponse *response, NSError *error) {
+	   
+	   };
 	```
 	
 3. 创建一个GET请求（每次调用`request`方法都会创建一个新的请求对象）
 
 	```
 	networking.request.get(@"/new/wbtop").executeRequest = ^(ALNetworkResponse *response, ALNetworkRequest *request, NSError *error) {
-  		              
-   };
+	
+	};
 	```
 
 4. ALNetworkResponse参数说明
